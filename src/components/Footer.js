@@ -2,12 +2,37 @@ import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
+import { NavLink as RouterNavLink } from 'react-router-dom'; // Alias RouterNavLink
+
+
+// const Title = styled.h3`
+//   font-size: 1rem;
+//   margin-bottom: 0.5rem;
+// `;
+
 
 const FooterWrapper = styled.footer`
   background: #111;
   color: #eee;
   padding-top: 2rem;
 `;
+
+const StyledNavLink = styled(RouterNavLink)`
+  display: block;
+  color: #eee; /* Assuming you want to keep the link color consistent */
+  text-decoration: none;
+  margin-bottom: 0.5rem; /* Space between links */
+
+  &:hover {
+    color: #faad14; /* Example hover color */
+  }
+
+  &.active {
+    color: #faad14; /* Example active link color */
+    font-weight: bold;
+  }
+`;
+
 
 const Container = styled.div`
   width: 100%;
@@ -84,14 +109,18 @@ const Footer = () => {
     <FooterWrapper>
       <Container>
         <FooterGrid>
-          <div>
+          {/* <div> */}
+            {/* <Title>Quick links</Title> */}
+            <div>
             <Title>Quick links</Title>
             <nav>
-              <NavLink to="/" end>{t("home")}</NavLink>
-              <NavLink to="/about">{t("about")}</NavLink>
-              <NavLink to="/shop">{t("shop")}</NavLink>
-              <NavLink to="/contact">{t("contact")}</NavLink>
+              <StyledNavLink to="/" end>{t("home")}</StyledNavLink>
+              <StyledNavLink to="/about">{t("about")}</StyledNavLink>
+              <StyledNavLink to="/shop">{t("shop")}</StyledNavLink>
+              <StyledNavLink to="/contact">{t("contact")}</StyledNavLink>
             </nav>
+          {/* </div> */}
+
           </div>
           <div>
             <Title>{t("subscribe")}</Title>

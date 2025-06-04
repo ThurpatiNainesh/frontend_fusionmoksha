@@ -478,7 +478,7 @@ const ProductDetails = () => {
 
   const relatedProductsData = allProducts
     .filter(p => p.id !== currentProduct.id)
-    .slice(0, 4)
+    .slice(0, 3)
     .map(rp => ({
       id: rp.id,
       name: rp.name || t('productNameUnavailable', 'Product Name Unavailable'),
@@ -705,7 +705,7 @@ const ProductDetails = () => {
                     e.preventDefault(); 
                     alert(t('addedToCartPlaceholder', `Added ${relatedProd.name} to cart (placeholder)`)); 
                   }}>
-                    {t('addToCart', 'Add to Cart')}
+                    {t('addToCart', 'ADD TO CART')}
                   </RelatedAddToCartButton>
                 </RelatedProductInfo>
               </RelatedProductCard>

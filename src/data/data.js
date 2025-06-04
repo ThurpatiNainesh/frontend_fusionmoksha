@@ -111,6 +111,60 @@ export const products = [
         date: "2024-05-17"
       }
     ]
+  },
+  {
+    id: 5,
+    name: "Spiced Honey",
+    description: "Natural and unrefined sugarcane jaggery in convenient crushed granular form. A healthy and delicious alternative to refined sugar, rich in minerals.",
+    price: 150,
+    image: "https://fusionmoksha.com/wp-content/uploads/2024/05/honey_spiced_fusion_moksha_1.png",
+    category: "Sweetener",
+    weight: 900, // in grams
+    origin: "India",
+    flavor: "Earthy and caramel-like sweetness",
+    rating: 4.6,
+    reviews: 40,
+    reviewList: [
+      {
+        author: "Kavita N.",
+        rating: 5,
+        text: "Love this jaggery! Perfect for my tea and sweets.",
+        date: "2024-05-19"
+      },
+      {
+        author: "Rohan G.",
+        rating: 4,
+        text: "Good quality, dissolves easily. Healthier option.",
+        date: "2024-05-17"
+      }
+    ]
+  },
+  {
+    id: 6,
+    name: "Multi Floral Honey Sourced from North East",
+    description: "Natural and unrefined sugarcane jaggery in convenient crushed granular form. A healthy and delicious alternative to refined sugar, rich in minerals.",
+    price: 150,
+    image: "https://fusionmoksha.com/wp-content/uploads/2024/05/honey_multi_floral_fusion_moksha_1-1.png",
+    category: "Sweetener",
+    weight: 900, // in grams
+    origin: "India",
+    flavor: "Earthy and caramel-like sweetness",
+    rating: 4.6,
+    reviews: 40,
+    reviewList: [
+      {
+        author: "Kavita N.",
+        rating: 5,
+        text: "Love this jaggery! Perfect for my tea and sweets.",
+        date: "2024-05-19"
+      },
+      {
+        author: "Rohan G.",
+        rating: 4,
+        text: "Good quality, dissolves easily. Healthier option.",
+        date: "2024-05-17"
+      }
+    ]
   }
 ];
 

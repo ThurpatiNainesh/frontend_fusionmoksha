@@ -99,8 +99,8 @@ const ContentSection = styled.div`
   p {
     line-height: 1.8;
     color: #222;
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.0rem;
+    font-weight: 300;
     margin-bottom: 1.5rem;
     letter-spacing: 0.5px;
   }

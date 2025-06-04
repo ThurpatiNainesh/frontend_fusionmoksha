@@ -154,7 +154,7 @@ const Shop = () => {
                 <ReviewCount>({product.reviews} {t('reviews')})</ReviewCount>
               </ProductRating>
               <AddToCartButton>
-                {t('addToCart')}
+                {t('ADD TO CART')}
               </AddToCartButton>
             </ProductInfo>
           </ProductCard>
