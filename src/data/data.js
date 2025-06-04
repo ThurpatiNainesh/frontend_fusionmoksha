@@ -4,11 +4,11 @@ export const products = [
   // and update the paths (e.g., to /images/products/new_product.jpg).
   {
     id: 1,
-    name: "Khapli Wheat Flour (Emmer Wheat Flour) Atta Stone Ground",
+    name: "Charcoal and Camphor Soap",
     description: "Stone-ground Khapli (Emmer) wheat flour, rich in fiber and nutrients. Ideal for soft rotis and healthy baking. Sourced from organic farms.",
     price: 250,
     originalPrice: 290,
-    image: "https://twobrothersindiashop.com/cdn/shop/files/Buy_Khapli_Flour_Shop_Now.webp?v=1748496496&width=800",
+    image: "https://fusionmoksha.com/wp-content/uploads/2024/04/characoal_and_camphor_soap_fusion_moksha_4.png",
     category: "Flour",
     weight: 1000, // in grams
     origin: "India",
@@ -32,11 +32,11 @@ export const products = [
   },
   {
     id: 2,
-    name: "A2 Gir Cow - Cultured Ghee",
+    name: "Hibiscus Onion Hair Oil",
     description: "Pure A2 Gir cow cultured ghee, made using traditional Bilona methods. Rich aroma, granular texture, and numerous health benefits.",
     price: 850,
     originalPrice: 950,
-    image: "https://twobrothersindiashop.com/cdn/shop/files/Purchase_A2_Cow_Cultured_Ghee.jpg?v=1747497941&width=800",
+    image: "https://fusionmoksha.com/wp-content/uploads/2024/04/hibiscus_onion_hair_oil_fusion_moksha_1.png",
     category: "Ghee",
     weight: 500, // in ml
     origin: "India",
@@ -60,10 +60,10 @@ export const products = [
   },
   {
     id: 3,
-    name: "Amlaprash (Limited Edition Chyawanprash)",
+    name: "Lakadong Turmeric",
     description: "A special limited edition Amlaprash, a potent Chyawanprash variant enriched with Amla and other vital herbs for boosting immunity and vitality.",
     price: 600,
-    image: "https://twobrothersindiashop.com/cdn/shop/files/Buy_Amlaprash.jpg?v=1732094177&width=800",
+    image: "https://fusionmoksha.com/wp-content/uploads/2024/04/lakadong_turmeric_fusion_moksha_4.png",
     category: "Health Supplement",
     weight: 500, // in grams
     origin: "India",
@@ -87,10 +87,10 @@ export const products = [
   },
   {
     id: 4,
-    name: "Sugarcane Jaggery, Crushed Granular",
+    name: "Amla and Reetha Castile Shampoo",
     description: "Natural and unrefined sugarcane jaggery in convenient crushed granular form. A healthy and delicious alternative to refined sugar, rich in minerals.",
     price: 150,
-    image: "https://twobrothersindiashop.com/cdn/shop/files/Buy_Sugarcane_Jaggery_Crushed.jpg?v=1742287504&width=800",
+    image: "https://fusionmoksha.com/wp-content/uploads/2024/04/amla_shikakai_shampoo_fusion_moksha_1.png",
     category: "Sweetener",
     weight: 900, // in grams
     origin: "India",
