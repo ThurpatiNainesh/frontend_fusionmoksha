@@ -16,7 +16,7 @@ const generateStars = (rating) => {
 
 const HeroBanner = styled.section`
   width: 100%;
-  min-height: 320px;
+  min-height: 220px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -73,30 +73,11 @@ const ProductName = styled.h3`
   font-size: 1.1rem;
 `;
 
-// const ProductPrice = styled.p` // Replaced by PriceContainer structure
-//   color: #faad14;
-//   font-weight: bold;
-//   font-size: 1.2rem;
-//   margin: 0.5rem 0;
-// `;
-
-const PriceContainer = styled.div`
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem; /* Space between original and discounted price */
-  margin: 0.5rem 0; /* Consistent with old ProductPrice margin */
-`;
-
-const OriginalPriceDisplay = styled.span`
-  font-size: 0.9rem; 
-  color: #777; /* Dimmer color for original price */
-  text-decoration: line-through;
-`;
-
-const DiscountedPriceDisplay = styled.span`
-  font-size: 1.2rem; /* Same as old ProductPrice */
-  font-weight: bold; /* Same as old ProductPrice */
-  color: #faad14; /* Same as old ProductPrice */
+const ProductPrice = styled.p`
+  color: #faad14;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
 `;
 
 const ProductRating = styled.div`
@@ -139,22 +120,13 @@ const Shop = () => {
             <ProductImage src={product.image} alt={product.name} style={{ position: 'relative', zIndex: 1 }} />
             <ProductInfo>
               <ProductName>{product.name}</ProductName>
-              <PriceContainer>
-                {product.originalPrice && product.originalPrice > product.price && (
-                  <OriginalPriceDisplay>
-                    ₹{product.originalPrice.toFixed(2)}
-                  </OriginalPriceDisplay>
-                )}
-                <DiscountedPriceDisplay>
-                  ₹{product.price.toFixed(2)}
-                </DiscountedPriceDisplay>
-              </PriceContainer>
+              <ProductPrice>₹{product.price}</ProductPrice>
               <ProductRating>
                 {generateStars(product.rating)}
                 <ReviewCount>({product.reviews} {t('reviews')})</ReviewCount>
               </ProductRating>
               <AddToCartButton>
-                {t('ADD TO CART')}
+                {t('Add To Cart')}
               </AddToCartButton>
             </ProductInfo>
           </ProductCard>

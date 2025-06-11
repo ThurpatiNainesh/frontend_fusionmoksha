@@ -2,6 +2,66 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearchQuery, setFilters } from '../store/searchSlice.js';
+import { logout } from '../store/authSlice.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass, faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons';
+
+// Ensure Font Awesome CSS is imported
+import '@fortawesome/fontawesome-svg-core/styles.css';
+import { config } from '@fortawesome/fontawesome-svg-core';
+config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically since it's imported above
+
+const IconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: 6rem;
+`;
+
+const SearchIcon = styled(FontAwesomeIcon)`
+  cursor: pointer;
+  font-size: 1.5rem;
+  
+  &:hover {
+    color: #faad14;
+  }
+`;
+
+const HeaderIcons = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+`;
+
+const Icon = styled(FontAwesomeIcon)`
+  cursor: pointer;
+  font-size: 1.2rem;
+  
+  &:hover {
+    color: #faad14;
+  }
+`;
+
+const SearchContainer = styled.div`
+  position: relative;
+  display: none;
+  
+  input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+
 
 const HeaderWrapper = styled.header`
   background: #ffffff;
@@ -9,26 +69,38 @@ const HeaderWrapper = styled.header`
   position: sticky;
   top: 0;
   z-index: 100;
-  margin-bottom: -70px;
+  padding-bottom: 0.1rem;
 `;
 
 const Container = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: auto;
-  padding: 1rem;
+  padding: 0.15rem;
 `;
 
 const Flex = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  margin: 0.05rem 0;
+  width: 100%;
+`;
+
+const MainNav = styled.nav`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  justify-content: flex-end;
+  flex: 1;
+  margin: 0 6rem;
 `;
 
 const LeftSection = styled.div`
   display: flex;
-  align-items: flex-start; // Align items to the top of the container
-  gap: 1.5rem; // Space between logo and search bar
+  align-items: flex-start;
+  gap: 0.3rem;
+  margin-right: 6rem;
 `;
 
 const SearchWrapper = styled.div`
@@ -40,7 +112,6 @@ const SearchWrapper = styled.div`
   margin-bottom: -70px; // To pull it up with the logo
   position: relative;
   z-index: 101;
-  /* transform: translateY(-8px); // Removed, flex-start should primarily handle top alignment */
 `;
 
 const SearchInput = styled.input`
@@ -60,7 +131,7 @@ const Logo = styled.div`
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
-  margin-bottom: -70px;
+  margin-bottom: -110px;
   position: relative;
   z-index: 101;
 `;
@@ -92,18 +163,42 @@ const LanguageSelect = styled.select`
 
 const Header = () => {
   const { t, i18n } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState('');
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const [searchQuery, setSearchQueryLocal] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+
+  const handleSearch = (e) => {
+    setSearchQueryLocal(e.target.value);
+    dispatch(setSearchQuery(e.target.value));
+  };
+
+  const handleProfileClick = () => {
+    window.location.href = '/register';
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+    setSearchQueryLocal(event.target.value);
+    dispatch(setSearchQuery(event.target.value));
   };
 
   const handleSearchSubmit = (event) => {
-    if (event.key === 'Enter' && searchQuery.trim() !== '') {
-      console.log('Search submitted:', searchQuery);
-      // Implement actual search logic here (e.g., navigate to search results page)
-      // For now, we'll just log it and clear the query
-      setSearchQuery('');
+    event.preventDefault();
+    if (searchQuery.trim()) {
+      // Dispatch search query and filters to Redux
+      dispatch(setSearchQuery(searchQuery));
+      dispatch(setFilters({
+        category: null,
+        minPrice: null,
+        maxPrice: null,
+        sortBy: 'relevance'
+      }));
+      // Navigate to search results page
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
     }
   };
 
@@ -114,37 +209,50 @@ const Header = () => {
           <LeftSection>
             <Logo>
               <NavLink to="/" end>
-                <img src="/images/mok1.2_03.png" alt="Fusion Moksha Logo" style={{ height: '100px', width: 'auto', marginBottom: '1rem', position: 'relative', zIndex: 102 }} />
+                <img src="/images/mok1.2_03.png" alt="Fusion Moksha Logo" style={{ height: '140px', width: 'auto', marginBottom: '2rem', position: 'relative', zIndex: 102 }} />
               </NavLink>
             </Logo>
-            <SearchWrapper>
-              <SearchInput 
-                type="text" 
-                placeholder={t('searchPlaceholder', 'Search products...')}
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyPress={handleSearchSubmit}
-              />
-              {/* You can add a search icon here if desired */}
-              {/* For example: <i className="fas fa-search"></i> */}
-            </SearchWrapper>
           </LeftSection>
-          <Nav>
-            <NavLink to="/" end>{t("home")}</NavLink>
-            <NavLink to="/about" end>{t("about")}</NavLink>
-            <NavLink to="/shop" end>{t("shop")}</NavLink>
-            <NavLink to="/contact" end>{t("contact")}</NavLink>
-          </Nav>
-          <LanguageSelect
-            value={i18n.language}
-            onChange={(e) => i18n.changeLanguage(e.target.value)}
-          >
-            <option value="en">EN</option>
-            <option value="pl">PL</option>
-            <option value="de">DE</option>
-            <option value="es">ES</option>
-            <option value="ru">RU</option>
-          </LanguageSelect>
+          <MainNav>
+            <NavLink to="/" exact>
+              {t('home')}
+            </NavLink>
+            <NavLink to="/about" end>
+              {t('about')}
+            </NavLink>
+            <NavLink to="/shop">
+              {t('shop')}
+            </NavLink>
+            <NavLink to="/contact">
+              {t('contact')}
+            </NavLink>
+            <IconContainer>
+              <SearchIcon 
+                icon={faMagnifyingGlass} 
+                onClick={() => setShowSearch(!showSearch)} 
+              />
+              <HeaderIcons>
+                <Icon icon={faCartShopping} />
+                <Icon icon={faUser} onClick={handleProfileClick} />
+              </HeaderIcons>
+            </IconContainer>
+            <SearchContainer style={{ display: showSearch ? 'block' : 'none' }}>
+              <input 
+                type="text" 
+                placeholder={t('searchPlaceholder')}
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </SearchContainer>
+            <LanguageSelect
+              value={i18n.language}
+              onChange={(e) => i18n.changeLanguage(e.target.value)}
+            >
+              <option value="en">English</option>
+              <option value="hi">हिंदी</option>
+              <option value="gu">ગુજરાતી</option>
+            </LanguageSelect>
+          </MainNav>
         </Flex>
       </Container>
     </HeaderWrapper>

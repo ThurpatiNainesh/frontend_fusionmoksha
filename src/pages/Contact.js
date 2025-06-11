@@ -152,14 +152,22 @@ const TextArea = styled.textarea`
 
 const SubmitButton = styled.button`
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background: #faad14;
   border: none;
   font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: background 0.2s;
+  border-radius: 4px;
+  
   &:hover {
     background: #e0a000;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    padding: 0.3rem;
   }
 `;
 
