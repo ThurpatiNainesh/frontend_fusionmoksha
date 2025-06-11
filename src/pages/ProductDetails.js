@@ -279,7 +279,7 @@ const RelatedReviewCount = styled.span`
 `;
 
 const RelatedAddToCartButton = styled.button`
-  background-color: #faad14;
+  background-color: #4CAF50;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -287,10 +287,10 @@ const RelatedAddToCartButton = styled.button`
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.3s ease;
-  margin-top: 0.5rem; // Added margin for spacing
+  margin-top: 0.5rem; 
   
   &:hover {
-    background-color: #f5a623;
+    background-color: #45a049;
   }
 `;
 

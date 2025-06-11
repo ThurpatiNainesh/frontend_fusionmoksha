@@ -93,7 +93,7 @@ const ReviewCount = styled.span`
 `;
 
 const AddToCartButton = styled.button`
-  background-color: #faad14;
+  background-color: #4CAF50;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -103,7 +103,7 @@ const AddToCartButton = styled.button`
   transition: background-color 0.3s ease;
   
   &:hover {
-    background-color: #f5a623;
+    background-color: #45a049;
   }
 `;
 

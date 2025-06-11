@@ -356,15 +356,17 @@ const Home = () => {
               color: '#666',
               lineHeight: '1.6'
             }}>Experience the perfect blend of style and comfort. Our collection features the latest trends in fashion, carefully curated to suit every occasion. From casual to formal, we have everything you need to express your unique style.</p>
-            <button style={{
-              backgroundColor: '#faad14',
-              color: 'white',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '4px',
-              border: 'none',
-              cursor: 'pointer',
-              marginTop: '1rem'
-            }}>know More</button>
+            <Link to="/about" style={{ textDecoration: 'none' }}>
+              <button style={{
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '4px',
+                border: 'none',
+                cursor: 'pointer',
+                marginTop: '1rem'
+              }}>know More</button>
+            </Link>
           </div>
           <div style={{
             flex: '1',
@@ -424,7 +426,7 @@ const Home = () => {
               lineHeight: '1.6'
             }}>Discover our exclusive collection of premium products designed for the modern lifestyle. Each piece is crafted with attention to detail and quality materials.</p>
             <button style={{
-              backgroundColor: '#faad14',
+              backgroundColor: '#4CAF50',
               color: 'white',
               padding: '0.5rem 1rem',
               borderRadius: '3px',
@@ -482,7 +484,7 @@ const Home = () => {
                   marginBottom: '1rem'
                 }}>Fresh styles for the season</p>
                 <button style={{
-                  backgroundColor: '#faad14',
+                  backgroundColor: '#4CAF50',
                   color: 'white',
                   padding: '0.3rem 0.8rem',
                   borderRadius: '4px',
@@ -531,7 +533,7 @@ const Home = () => {
                   marginBottom: '1rem'
                 }}>Latest additions to our collection</p>
                 <button style={{
-                  backgroundColor: '#faad14',
+                  backgroundColor: '#4CAF50',
                   color: 'white',
                   padding: '0.3rem 0.8rem',
                   borderRadius: '4px',
@@ -580,7 +582,7 @@ const Home = () => {
                   marginBottom: '1rem'
                 }}>Most loved by our customers</p>
                 <button style={{
-                  backgroundColor: '#faad14',
+                  backgroundColor: '#4CAF50',
                   color: 'white',
                   padding: '0.3rem 0.8rem',
                   borderRadius: '4px',
