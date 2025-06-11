@@ -293,16 +293,21 @@ const Home = () => {
       </ProductGrid>
       <div style={{ padding: '2rem 0', textAlign: 'center' }}>
         <Link to="/shop" style={{ textDecoration: 'none' }}>
-          <img src="/images/homePage/home_48.png" alt="Shop Now" style={{ 
-            width: '15%',
-            height: '15%',
-            display: 'inline-block',
+          <button style={{
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            padding: '1rem 2rem',
+            borderRadius: '4px',
+            border: 'none',
             cursor: 'pointer',
-            transition: 'transform 0.3s ease'
+            fontSize: '1.1rem',
+            fontWeight: '600',
+            transition: 'transform 0.3s ease',
+            display: 'inline-block'
           }} 
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          />
+          >Shop All</button>
         </Link>
       </div>
       {/* <div style={{ padding: '2rem 0' }}>
