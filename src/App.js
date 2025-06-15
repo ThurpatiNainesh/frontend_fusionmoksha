@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { setAuthToken } from './services/api';
 import I18nProvider from './components/I18nProvider';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -11,9 +12,22 @@ import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import SearchResults from './pages/SearchResults';
+import Cart from './pages/Cart';
 import { store } from './store/index.js';
 
+// Initialize auth token from localStorage
+const initializeAuth = () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    setAuthToken(token);
+  }
+};
+
 const App = () => {
+  // Initialize auth token when app loads
+  useEffect(() => {
+    initializeAuth();
+  }, []);
   return (
     <BrowserRouter>
       <I18nProvider>
@@ -27,6 +41,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/search" element={<Layout children={<SearchResults />} />} />
+            <Route path="/cart" element={<Layout children={<Cart />} />} />
           </Routes>
         </Provider>
       </I18nProvider>

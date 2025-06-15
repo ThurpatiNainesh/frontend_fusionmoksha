@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAuth } from '../store/authSlice.js';
+import { login, clearError } from '../store/authSlice.js';
 
 const Container = styled.div`
   display: flex;
@@ -92,13 +92,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    dispatch(setAuth({
-      user: { email },
-      token: 'temp_token' // In a real app, this would come from the server
-    }));
-    navigate('/shop', { replace: true });
+    
+    try {
+      await dispatch(login({ email, password })).unwrap();
+      navigate('/shop', { replace: true });
+    } catch (error) {
+      // Error is already handled by the auth slice
+    }
   };
+
+  // Clear any previous errors when component mounts
+  React.useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   return (
     <Container>

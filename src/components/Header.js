@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSearchQuery, setFilters } from '../store/searchSlice.js';
 import { logout } from '../store/authSlice.js';
+import { fetchCartItems } from '../store/cartSlice.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons';
 
@@ -164,9 +165,17 @@ const LanguageSelect = styled.select`
 const Header = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cart);
   const [searchQuery, setSearchQueryLocal] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCartItems());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const handleSearch = (e) => {
     setSearchQueryLocal(e.target.value);
@@ -174,11 +183,17 @@ const Header = () => {
   };
 
   const handleProfileClick = () => {
-    window.location.href = '/register';
+    if (isAuthenticated) {
+      window.location.href = '/profile';
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   const handleLogout = () => {
     dispatch(logout());
+    // Optional: Redirect to home page after logout
+    window.location.href = '/';
   };
 
   const handleSearchChange = (event) => {
@@ -232,8 +247,62 @@ const Header = () => {
                 onClick={() => setShowSearch(!showSearch)} 
               />
               <HeaderIcons>
-                <Icon icon={faCartShopping} />
-                <Icon icon={faUser} onClick={handleProfileClick} />
+                <div style={{ position: 'relative' }}>
+                  <NavLink 
+                    to="/cart" 
+                    style={{ color: 'inherit' }}
+                    onClick={() => dispatch(fetchCartItems())}
+                  >
+                    <Icon icon={faCartShopping} />
+                    {cartItems.length > 0 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-8px',
+                        right: '-8px',
+                        backgroundColor: '#ff4d4f',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.7rem',
+                        fontWeight: 'bold'
+                      }}>
+                        {cartItems.length > 9 ? '9+' : cartItems.length}
+                      </span>
+                    )}
+                  </NavLink>
+                </div>
+                <Icon 
+                  icon={faUser} 
+                  onClick={handleProfileClick} 
+                  title={isAuthenticated ? 'My Profile' : 'Login/Register'}
+                />
+                {isAuthenticated && (
+                  <button 
+                    onClick={handleLogout}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#333',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '4px',
+                      marginLeft: '0.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      ':hover': {
+                        backgroundColor: '#f5f5f5',
+                      }
+                    }}
+                  >
+                    <span>Logout</span>
+                  </button>
+                )}
               </HeaderIcons>
             </IconContainer>
             <SearchContainer style={{ display: showSearch ? 'block' : 'none' }}>

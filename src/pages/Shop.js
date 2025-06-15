@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { products } from '../data/data';
+import { useDispatch, useSelector } from 'react-redux';
+import AddToCartButton from '../components/AddToCartButton';
+import { getProducts } from '../store/productSlice';
 
 // Helper function to generate star rating
 const generateStars = (rating) => {
@@ -92,46 +94,115 @@ const ReviewCount = styled.span`
   margin-left: 0.5rem;
 `;
 
-const AddToCartButton = styled.button`
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
 const Shop = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { 
+    products = [], 
+    loading, 
+    error,
+    pagination = { currentPage: 1, totalPages: 1 }
+  } = useSelector((state) => ({
+    products: state.products.products,
+    loading: state.products.loading,
+    error: state.products.error,
+    pagination: state.products.pagination
+  }));
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    dispatch(getProducts({ page: currentPage, limit: 6 }));
+  }, [dispatch, currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+  
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem' }}>
+        <h2>Loading products...</h2>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+        <h2>Error loading products</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <HeroBanner style={{ backgroundImage: 'url(/images/shop/shop_02.jpg)' }}>
         <h1>{t('headingShop')}</h1>
       </HeroBanner>
       <ProductGrid>
-        {products.map((product) => (
-          <ProductCard key={product.id} to={`/shop/${product.id}`}>
-            <ProductImage src={product.image} alt={product.name} style={{ position: 'relative', zIndex: 1 }} />
-            <ProductInfo>
-              <ProductName>{product.name}</ProductName>
-              <ProductPrice>₹{product.price}</ProductPrice>
-              <ProductRating>
-                {generateStars(product.rating)}
-                <ReviewCount>({product.reviews} {t('reviews')})</ReviewCount>
-              </ProductRating>
-              <AddToCartButton>
-                {t('Add To Cart')}
-              </AddToCartButton>
-            </ProductInfo>
-          </ProductCard>
-        ))}
+        {products && products.length > 0 ? (
+          products.map((product) => {
+            const defaultVariant = product.defaultVariant || {};
+            return (
+              <ProductCard key={product._id} to={`/shop/${product._id}`}>
+                <ProductImage 
+                  src={defaultVariant.image || product.mainImage} 
+                  alt={product.name} 
+                  style={{ position: 'relative', zIndex: 1 }} 
+                />
+                <ProductInfo>
+                  <ProductName>{product.name}</ProductName>
+                  <ProductPrice>
+                    ₹{defaultVariant.discountPrice || defaultVariant.price}
+                    {defaultVariant.originalPrice > defaultVariant.discountPrice && (
+                      <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '8px', fontSize: '0.9rem' }}>
+                        ₹{defaultVariant.originalPrice}
+                      </span>
+                    )}
+                  </ProductPrice>
+                  <ProductRating>
+                    {generateStars(product.rating || 0)}
+                    <ReviewCount>({product.reviews || 0} {t('reviews')})</ReviewCount>
+                  </ProductRating>
+                  <AddToCartButton 
+                    product={product} 
+                    weight={defaultVariant.weight}
+                  />
+                </ProductInfo>
+              </ProductCard>
+            );
+          })
+        ) : (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
+            <h3>No products found</h3>
+          </div>
+        )}
       </ProductGrid>
+      
+      {pagination && pagination.totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem', gap: '0.5rem' }}>
+          {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+            <button
+              key={pageNum}
+              onClick={() => handlePageChange(pageNum)}
+              style={{
+                padding: '0.5rem 1rem',
+                margin: '0 0.25rem',
+                border: '1px solid #ddd',
+                background: pageNum === currentPage ? '#1890ff' : 'white',
+                color: pageNum === currentPage ? 'white' : '#333',
+                cursor: 'pointer',
+                borderRadius: '4px',
+              }}
+            >
+              {pageNum}
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 };

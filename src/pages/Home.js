@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { products } from '../data/data';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTopProducts } from '../store/productSlice';
 import AddToCartButton from '../components/AddToCartButton';
 
 // Helper function to generate star rating
@@ -251,6 +252,36 @@ const ReviewCount = styled.span`
 
 const Home = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { topProducts, loading, error } = useSelector((state) => ({
+    topProducts: state.products.topProducts || [],
+    loading: state.products.loading,
+    error: state.products.error
+  }));
+
+  useEffect(() => {
+    dispatch(getTopProducts());
+  }, [dispatch]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem' }}>
+        <h2>Loading featured products...</h2>
+      </div>
+    );
+  }
+
+
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+        <h2>Error loading products</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+
   return (
     <>
       <div style={{ paddingTop: '10px', paddingBottom: '0.5rem' }}>
@@ -274,22 +305,37 @@ const Home = () => {
         <HomePageImage src="/images/homePage/home_12.png" alt="Home Section 2" />
       </HomePageSection>
       <ProductGrid>
-        {products.slice(0, 3).map((product) => (
-            <ProductCard key={product.id} to={`/shop/${product.id}`}>
-            <ProductImage src={product.image} alt={product.name} style={{ position: 'relative', zIndex: 1 }} />
-            <ProductInfo>
-              <ProductName>{product.name}</ProductName>
-              <ProductPrice>₹{product.price}</ProductPrice>
-              <ProductRating>
-                {generateStars(product.rating)}
-                <ReviewCount>({product.reviews} {t('reviews')})</ReviewCount>
-              </ProductRating>
-              <AddToCartButton>
-                {t('Add To Cart')}
-              </AddToCartButton>
-            </ProductInfo>
-          </ProductCard>
-        ))}
+        {topProducts.slice(0, 3).map((product) => {
+          const defaultVariant = product.defaultVariant || product.variants?.[0] || {};
+          return (
+            <ProductCard key={product._id} to={`/shop/${product._id}`}>
+              <ProductImage 
+                src={defaultVariant.image || product.mainImage} 
+                alt={product.name} 
+                style={{ position: 'relative', zIndex: 1 }} 
+              />
+              <ProductInfo>
+                <ProductName>{product.name}</ProductName>
+                <ProductPrice>
+                  ₹{defaultVariant.discountPrice || defaultVariant.price}
+                  {defaultVariant.originalPrice > defaultVariant.discountPrice && (
+                    <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '8px', fontSize: '0.9rem' }}>
+                      ₹{defaultVariant.originalPrice}
+                    </span>
+                  )}
+                </ProductPrice>
+                <ProductRating>
+                  {generateStars(product.rating || 0)}
+                  <ReviewCount>({product.reviews || 0} {t('reviews')})</ReviewCount>
+                </ProductRating>
+                <AddToCartButton 
+                  product={product} 
+                  weight={defaultVariant.weight}
+                />
+              </ProductInfo>
+            </ProductCard>
+          );
+        })}
       </ProductGrid>
       <div style={{ padding: '2rem 0', textAlign: 'center' }}>
         <Link to="/shop" style={{ textDecoration: 'none' }}>
