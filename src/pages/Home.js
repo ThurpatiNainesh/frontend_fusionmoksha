@@ -226,15 +226,29 @@ const Home = () => {
           display: 'flex',
           gap: '2rem',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          flexDirection: 'row-reverse'
         }}>
+
           <div style={{
             flex: '1',
-            maxWidth: '500px'
+            maxWidth: '500px',
+            padding: '0 2rem'
           }}>
+            <p style={{
+              color: '#4CAF50',
+              fontSize: '1rem',
+              fontWeight: '600',
+              marginBottom: '0.5rem',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>Natural & Pure</p>
             <h2 style={{
               color: '#333',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              marginTop: '0',
+              fontSize: '2.25rem',
+              fontWeight: '700'
             }}>Welcome to Fusion Moksha</h2>
             <p style={{
               color: '#666',
