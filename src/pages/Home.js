@@ -3,20 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { getTopProducts } from '../store/productSlice';
 import ProductCard from '../components/ProductCard';
 
-// Helper function to generate star rating
-const generateStars = (rating) => {
-  const stars = Math.floor(rating);
-  const half = rating - stars >= 0.5;
-  const fullStars = '★'.repeat(stars);
-  const halfStar = half ? '★' : '';
-  const emptyStars = '☆'.repeat(5 - stars - (half ? 1 : 0));
-  return `${fullStars}${halfStar}${emptyStars}`;
-};
 
 const CategorySection = styled.div`
   display: flex;
@@ -34,26 +23,6 @@ const CategorySection = styled.div`
   
   -ms-overflow-style: none;
   scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  @media (max-width: 768px) {
-    gap: 2rem;
-    padding: 1.5rem 0;
-  }
 `;
 
 const CategoryImage = styled.img`
@@ -76,7 +45,7 @@ const CategoryImage = styled.img`
 
 const HorizontalImage = styled.div`
   width: calc(25% - 0.5rem);
-  height: 300px;
+  height: 375px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -89,7 +58,7 @@ const HorizontalImage = styled.div`
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
   }
-
+  
   img {
     width: 100%;
     height: 100%;
@@ -100,98 +69,6 @@ const HorizontalImage = styled.div`
       transform: scale(1.05);
     }
   }
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover:before {
-    opacity: 1;
-  }
-
-  @media (max-width: 768px) {
-    width: 180px;
-    height: 220px;
-  }
-`;
-
-const LoadingImage = styled.div`
-  width: 200px;
-  height: 250px;
-  background: #f5f5f5;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-
-  @keyframes pulse {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.5; }
-    100% { opacity: 0.8; }
-  }
-
-  &::after {
-    content: '';
-    width: 40px;
-    height: 40px;
-    border: 2px solid #e0e0e0;
-    border-radius: 50%;
-    border-top-color: #faad14;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  @media (max-width: 768px) {
-    width: 180px;
-    height: 220px;
-  }
-`;
-
-const HeroBanner = styled.section`
-  width: 100%;
-  min-height: 220px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 2rem;
-  color: white;
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/homePage/home_11.png');
-  h1 {
-    color: #fff;
-    font-size: clamp(1.75rem, 4vw, 3rem);
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-`;
-
-const HomePageSection = styled.section`
-  width: 100%;
-  margin-top: 0;
-  padding: 0;
-`;
-
-const HomePageImage = styled.img`
-  width: 100%;
-  height: auto;
-  display: block;
 `;
 
 const ProductGrid = styled.div`
@@ -308,7 +185,7 @@ const Home = () => {
         </Link>
       </div>
 
-      <div style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
+      <div style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
         <CategorySection>
           <HorizontalImage>
             <img src="/images/homePage/home_52.png" alt="Image 1" />
@@ -386,6 +263,25 @@ const Home = () => {
             }} />
           </div>
         </div>
+      </div>
+      <div style={{
+        marginTop: '0.2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
+      }}>
+        <img
+          src="/images/homePage/home_73.png" alt="Home Section 6"
+          style={{
+            marginBottom:"-1rem",
+            width: '100%',
+            height: 'auto',
+            display: 'block'
+          }}
+        />
       </div>
        <div style={{
         marginTop: '0.2rem',
