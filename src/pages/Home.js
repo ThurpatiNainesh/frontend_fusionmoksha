@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { getTopProducts } from '../store/productSlice';
-import AddToCartButton from '../components/AddToCartButton';
+import ProductCard from '../components/ProductCard';
 
 // Helper function to generate star rating
 const generateStars = (rating) => {
@@ -196,58 +198,7 @@ const ProductGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
-  padding-top: 2rem;
-  overflow: visible;
-`;
-
-const ProductCard = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const ProductImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: contain;
-  background-color: #f5f5f5;
-  padding: 1rem;
-`;
-
-const ProductInfo = styled.div`
-  padding: 1rem;
-  overflow: visible;
-`;
-
-const ProductName = styled.h3`
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-`;
-
-const ProductPrice = styled.p`
-  color: #faad14;
-  font-weight: bold;
-  font-size: 1.2rem;
-  margin: 0.5rem 0;
-`;
-
-const ProductRating = styled.div`
-  color: #faad14;
-  font-size: 1rem;
-  margin: 0.5rem 0;
-`;
-
-const ReviewCount = styled.span`
-  color: #666;
-  font-size: 0.9rem;
-  margin-left: 0.5rem;
+  padding: 2rem 0;
 `;
 
 const Home = () => {
@@ -294,48 +245,48 @@ const Home = () => {
           <CategoryImage src="/images/category/cat_13.png" alt="Category 6" />
         </CategorySection>
       </div>
-      <div style={{ marginTop: '0.2rem' }}>
-        <img src="/images/homePage/home_11.png" alt="Hero Image" style={{
-          width: '100%',
-          height: 'auto',
-          display: 'block'
-        }} />
+      <div style={{
+        marginTop: '0.2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
+      }}>
+        <img 
+          src="/images/homePage/home_11.png" 
+          alt="Hero Image" 
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block'
+          }} 
+        />
       </div>
-      <HomePageSection>
-        <HomePageImage src="/images/homePage/home_12.png" alt="Home Section 2" />
-      </HomePageSection>
+      <div style={{
+        marginTop: '0.2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
+      }}>
+        <img
+          src="/images/homePage/home_12.png"
+          alt="Home Section 2"
+          style={{
+            marginTop:"-2rem",
+            height: 'auto',
+            display: 'block'
+          }}
+        />
+      </div>
       <ProductGrid>
-        {topProducts.slice(0, 3).map((product) => {
-          const defaultVariant = product.defaultVariant || product.variants?.[0] || {};
-          return (
-            <ProductCard key={product._id} to={`/shop/${product._id}`}>
-              <ProductImage 
-                src={defaultVariant.image || product.mainImage} 
-                alt={product.name} 
-                style={{ position: 'relative', zIndex: 1 }} 
-              />
-              <ProductInfo>
-                <ProductName>{product.name}</ProductName>
-                <ProductPrice>
-                  ₹{defaultVariant.discountPrice || defaultVariant.price}
-                  {defaultVariant.originalPrice > defaultVariant.discountPrice && (
-                    <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '8px', fontSize: '0.9rem' }}>
-                      ₹{defaultVariant.originalPrice}
-                    </span>
-                  )}
-                </ProductPrice>
-                <ProductRating>
-                  {generateStars(product.rating || 0)}
-                  <ReviewCount>({product.reviews || 0} {t('reviews')})</ReviewCount>
-                </ProductRating>
-                <AddToCartButton 
-                  product={product} 
-                  weight={defaultVariant.weight}
-                />
-              </ProductInfo>
-            </ProductCard>
-          );
-        })}
+        {topProducts.slice(0, 3).map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
       </ProductGrid>
       <div style={{ padding: '2rem 0', textAlign: 'center' }}>
         <Link to="/shop" style={{ textDecoration: 'none' }}>
@@ -356,10 +307,6 @@ const Home = () => {
           >Shop All</button>
         </Link>
       </div>
-      {/* <div style={{ padding: '2rem 0' }}>
-        <h2>{t('headingAbout')}</h2>
-        <p>Home content goes here...</p>
-      </div> */}
 
       <div style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
         <CategorySection>
@@ -378,15 +325,22 @@ const Home = () => {
         </CategorySection>
       </div>
       <div style={{
-        paddingTop: '0',
-        marginTop: '-1rem'
+        marginTop: '0.2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
       }}>
-        <img src="/images/homePage/home_64.png" alt="Home Section 4" style={{
-          width: '100%',
-          height: 'auto',
-          display: 'block',
-          margin: '0'
-        }} />
+        <img
+          src="/images/homePage/home_64.png" alt="Home Section 4"
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block'
+          }}
+        />
       </div>
       <div style={{ paddingTop: '2rem' }}>
         <div style={{
@@ -433,21 +387,41 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div>
-        <img src="/images/homePage/home_74.png" alt="Home Section 6" style={{
-          width: '100%',
-          height: 'auto',
-          display: 'block',
-          margin: '0 auto'
-        }} />
+       <div style={{
+        marginTop: '0.2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
+      }}>
+        <img
+          src="/images/homePage/home_74.png" alt="Home Section 6"
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block'
+          }}
+        />
       </div>
-      <div>
-        <img src="/images/homePage/home_75.png" alt="Home Section 7" style={{
-          width: '100%',
-          height: 'auto',
-          display: 'block',
-          margin: '0 auto'
-        }} />
+      <div style={{
+        marginTop: '-2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
+      }}>
+        <img
+          src="/images/homePage/home_75.png" alt="Home Section 7"
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block'
+          }}
+        />
       </div>
       <div style={{ paddingTop: '2rem' }}>
         <div style={{

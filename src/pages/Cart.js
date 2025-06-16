@@ -394,7 +394,16 @@ const Cart = () => {
                     if (item.quantity === 1) {
                       handleRemoveItem(item._id);
                     } else {
-                      dispatch(updateCartItemQuantity({ itemId: item._id, change: -1 }));
+                      // Optimistically update the UI
+                      dispatch(updateItemQuantityOptimistic({ itemId: item._id, change: -1 }));
+                      // Make the API call
+                      dispatch(updateCartItemQuantity({ itemId: item._id, change: -1 }))
+                        .then((result) => {
+                          if (result.error) {
+                            // Revert the optimistic update if the API call fails
+                            dispatch(revertItemQuantity({ itemId: item._id }));
+                          }
+                        });
                     }
                   }}
                   aria-label={t('cart.decreaseQuantity', 'Decrease quantity')}
@@ -428,7 +437,16 @@ const Cart = () => {
                 <QuantityButton 
                   onClick={(e) => {
                     e.preventDefault();
-                    dispatch(updateCartItemQuantity({ itemId: item._id, change: 1 }));
+                    // Optimistically update the UI
+                    dispatch(updateItemQuantityOptimistic({ itemId: item._id, change: 1 }));
+                    // Make the API call
+                    dispatch(updateCartItemQuantity({ itemId: item._id, change: 1 }))
+                      .then((result) => {
+                        if (result.error) {
+                          // Revert the optimistic update if the API call fails
+                          dispatch(revertItemQuantity({ itemId: item._id }));
+                        }
+                      });
                   }}
                   aria-label={t('cart.increaseQuantity', 'Increase quantity')}
                 >

@@ -46,9 +46,11 @@ const AddToCartButton = ({ product, weight, quantity = 1, className }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const { isAuthenticated } = useSelector(state => state.auth);
-  const { loading } = useSelector(state => state.cart);
-
-  const handleAddToCart = async () => {
+  
+  const handleAddToCart = async (e) => {
+    e.preventDefault(); // Prevent default action
+    e.stopPropagation(); // Stop event propagation
+    
     if (!isAuthenticated) {
       navigate('/login', { state: { from: window.location.pathname } });
       return;
@@ -74,7 +76,7 @@ const AddToCartButton = ({ product, weight, quantity = 1, className }) => {
   return (
     <Button 
       onClick={handleAddToCart}
-      disabled={isAdding || loading}
+      disabled={isAdding}
       className={className}
       $added={isAdded}
       aria-label={isAdded ? 'Added to cart' : 'Add to cart'}
