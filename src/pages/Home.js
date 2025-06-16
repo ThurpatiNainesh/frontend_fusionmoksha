@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getTopProducts } from '../store/productSlice';
 import ProductCard from '../components/ProductCard';
+import { featuredData } from '../data/featuredData';
+import FeatureBig from '../components/features/FeatureBig';
+import FeatureSmall from '../components/features/FeatureSmall';
 
 
 const CategorySection = styled.div`
@@ -45,7 +48,7 @@ const CategoryImage = styled.img`
 
 const HorizontalImage = styled.div`
   width: calc(25% - 0.5rem);
-  height: 375px;
+  height: 450px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -75,7 +78,6 @@ const ProductGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
-  padding: 2rem 0;
 `;
 
 const Home = () => {
@@ -161,7 +163,7 @@ const Home = () => {
         />
       </div>
       <ProductGrid>
-        {topProducts.slice(0, 3).map((product) => (
+        {topProducts.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}
       </ProductGrid>
@@ -240,14 +242,24 @@ const Home = () => {
             }}>Experience the perfect blend of style and comfort. Our collection features the latest trends in fashion, carefully curated to suit every occasion. From casual to formal, we have everything you need to express your unique style.</p>
             <Link to="/about" style={{ textDecoration: 'none' }}>
               <button style={{
-                backgroundColor: '#4CAF50',
-                color: 'white',
+                backgroundColor: 'white',
+                color: 'black',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '4px',
-                border: 'none',
+                border: '2px solid black',
                 cursor: 'pointer',
-                marginTop: '1rem'
-              }}>know More</button>
+                marginTop: '1rem',
+                fontWeight: '550',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>Know More</button>
             </Link>
           </div>
           <div style={{
@@ -319,201 +331,31 @@ const Home = () => {
           }}
         />
       </div>
-      <div style={{ paddingTop: '2rem' }}>
+      <div style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <div style={{
           display: 'flex',
           gap: '2rem',
           alignItems: 'flex-start',
           height: '100%'
         }}>
-          {/* Left side with big image and description */}
-          <div style={{
-            flex: '1',
-            maxWidth: '600px',
-            height: '100%'
-          }}>
-            <img src="/images/homePage/home_80.png" alt="Main Feature" style={{
-              width: '100%',
-              height: '100%',
-              display: 'block',
-              marginBottom: '1rem'
-            }} />
-            <h3 style={{
-              color: '#333',
-              marginBottom: '0.5rem'
-            }}>Special Collection</h3>
-            <p style={{
-              color: '#666',
-              lineHeight: '1.6'
-            }}>Discover our exclusive collection of premium products designed for the modern lifestyle. Each piece is crafted with attention to detail and quality materials.</p>
-            <button style={{
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '3px',
-              border: 'none',
-              cursor: 'pointer',
-              marginTop: '0.75rem',
-              fontSize: '0.9rem',
-              fontWeight: 'normal'
-            }}>Read More</button>
-          </div>
-          {/* Right side with three images */}
+          {/* Left side with big feature */}
+          <FeatureBig {...featuredData.mainFeature} />
+          
+          {/* Right side with three small features */}
           <div style={{
             flex: '1',
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
             height: '100%',
-            maxHeight: '100%'
+            maxHeight: '100%',
+            paddingTop: '1rem'
           }}>
-            <div style={{
-              flex: '1',
-              display: 'flex',
-              gap: '1rem',
-              alignItems: 'center',
-              padding: '1rem'
-            }}>
-              <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}>
-                <img src="/images/homePage/home_77.png" alt="Feature 1" style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} />
+            {featuredData.features.map((feature, index) => (
+              <div key={feature.id} style={index === 0 ? { paddingTop: '0' } : {}}>
+                <FeatureSmall {...feature} />
               </div>
-              <div style={{
-                flex: '1',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center'
-              }}>
-                <h4 style={{
-                  color: '#333',
-                  marginBottom: '0.5rem',
-                  fontSize: '1.1rem',
-                  fontWeight: '600'
-                }}>Summer Collection</h4>
-                <p style={{
-                  color: '#666',
-                  lineHeight: '1.4',
-                  marginBottom: '1rem'
-                }}>Fresh styles for the season</p>
-                <button style={{
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  padding: '0.3rem 0.8rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  alignSelf: 'flex-start'
-                }}>Read More</button>
-              </div>
-            </div>
-            <div style={{
-              flex: '1',
-              display: 'flex',
-              gap: '1rem',
-              alignItems: 'center',
-              padding: '1rem'
-            }}>
-              <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}>
-                <img src="/images/homePage/home_77.png" alt="Feature 2" style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} />
-              </div>
-              <div style={{
-                flex: '1',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center'
-              }}>
-                <h4 style={{
-                  color: '#333',
-                  marginBottom: '0.5rem',
-                  fontSize: '1.1rem',
-                  fontWeight: '600'
-                }}>New Arrivals</h4>
-                <p style={{
-                  color: '#666',
-                  lineHeight: '1.4',
-                  marginBottom: '1rem'
-                }}>Latest additions to our collection</p>
-                <button style={{
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  padding: '0.3rem 0.8rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  alignSelf: 'flex-start'
-                }}>Read More</button>
-              </div>
-            </div>
-            <div style={{
-              flex: '1',
-              display: 'flex',
-              gap: '1rem',
-              alignItems: 'center',
-              padding: '1rem'
-            }}>
-              <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}>
-                <img src="/images/homePage/home_77.png" alt="Feature 3" style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }} />
-              </div>
-              <div style={{
-                flex: '1',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center'
-              }}>
-                <h4 style={{
-                  color: '#333',
-                  marginBottom: '0.5rem',
-                  fontSize: '1.1rem',
-                  fontWeight: '600'
-                }}>Best Sellers</h4>
-                <p style={{
-                  color: '#666',
-                  lineHeight: '1.4',
-                  marginBottom: '1rem'
-                }}>Most loved by our customers</p>
-                <button style={{
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  padding: '0.3rem 0.8rem',
-                  borderRadius: '4px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  alignSelf: 'flex-start'
-                }}>Read More</button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
