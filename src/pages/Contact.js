@@ -23,70 +23,125 @@ const HeroBanner = styled.section`
 `;
 
 const ContentWrapper = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 `;
 
 const ContactGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: 0;
+  width: 100%;
 `;
 
 const ContactInfo = styled.div`
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background-color: #f2f2f2; /* Light cement color */
+  padding: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  
-  h2 {
-    color: #faad14;
-    font-size: 1.75rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  p {
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    color: #333;
-    
-    strong {
-      color: #222;
-      font-weight: 600;
-    }
-  }
-  
-  .contact-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    
-    &:hover {
-      transform: scale(1.02);
-    }
-  }
+  overflow: hidden;
+  position: relative;
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    .contact-image {
-      grid-column: 1 / -1;
-      margin-bottom: 1.5rem;
-    }
+  }
+`;
+
+const ContactInfoContent = styled.div`
+  padding: 3rem 10%;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  
+  h2 {
+    margin-bottom: 2rem;
+    color: #333;
+    font-size: 1.75rem;
+  }
+`;
+
+const ContactItem = styled.div`
+  margin-bottom: 2rem;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const ContactHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  
+  i {
+    color: #8c8c8c; /* Cement color */
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+  }
+`;
+
+const ContactValue = styled.div`
+  padding-left: 2rem;
+  color: #666;
+  font-size: 1rem;
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 1.5rem 0;
+`;
+
+const ContactImageContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  background-color: rgba(255, 255, 255, 0.3); /* Lighter fog effect to blend with background */
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(242, 242, 242, 0.9), rgba(242, 242, 242, 0.3));
+    z-index: 1;
+  }
+  
+  img {
+    width: 80%; /* Reduced size */
+    height: auto;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    object-fit: contain;
+    display: block;
+    z-index: 0;
+  }
+  
+  @media (max-width: 768px) {
+    position: relative;
+    width: 100%;
+    height: 250px;
   }
 `;
 
 const ContactForm = styled.form`
   background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 3rem 10%;
+  width: 100%;
   
   h2 {
     color: #faad14;
@@ -139,30 +194,47 @@ const Input = styled.input`
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #8c8c8c; /* Icon cement color */
+  border-radius: 4px;
+  font-size: 0.9rem;
+  
+  &:focus {
+    outline: none;
+    border-color: #8c8c8c; /* Icon cement color */
+    box-shadow: 0 0 0 1px rgba(140, 140, 140, 0.2);
+  }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #8c8c8c; /* Icon cement color */
+  border-radius: 4px;
   height: 150px;
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: #8c8c8c; /* Icon cement color */
+    box-shadow: 0 0 0 1px rgba(140, 140, 140, 0.2);
+  }
 `;
 
 const SubmitButton = styled.button`
   width: 100%;
   padding: 0.5rem;
-  background: #faad14;
+  background-color: #8c8c8c !important; /* Icon cement color - with !important */
   border: none;
   font-weight: 600;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.2s;
   border-radius: 4px;
+  color: white;
   
   &:hover {
-    background: #e0a000;
+    background-color: #777777 !important;
   }
 
   @media (max-width: 768px) {
@@ -178,9 +250,53 @@ const Contact = () => {
       {/* <HeroBanner style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1546832947-15b015b363e5?w=1200)' }}>
         <h1>{t('headingContact')}</h1>
       </HeroBanner> */}
-      <HeroBanner style={{ backgroundImage: 'url(/images/contactuspage/cont0.png)' }}>
+      {/* <HeroBanner style={{ backgroundImage: 'url(/images/contactuspage/cont0.png)' }}>
         <h1>{t('headingContact')}</h1>
-      </HeroBanner>
+      </HeroBanner> */}
+      <div style={{
+        marginTop: '0.2rem',
+        width: '100vw',
+        position: 'relative',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        height: '360px',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <img 
+          src="/images/contactuspage/cont0.png" 
+          alt="Hero Image" 
+          style={{
+            width: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: 'block',
+            position: 'absolute',
+            zIndex: 1
+          }} 
+        />
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          zIndex: 2
+        }}></div>
+        <h1 style={{
+          color: '#fff',
+          fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+          margin: 0,
+          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+          zIndex: 3,
+          textAlign: 'center'
+        }}>{t('headingContact')}</h1>
+      </div>
        {/* <img src="/images/contactuspage/cont0.png" alt="Contact Banner" style={{ width: '100%', height: 'auto', display: 'block', marginTop: '-1rem' }} /> */}
       <ContentWrapper>
         <ContactGrid>
@@ -202,14 +318,41 @@ const Contact = () => {
             </div>
           </ContactForm>
           <ContactInfo>
-            <div>
+            <ContactInfoContent>
               <h2>Contact Information</h2>
-              <p><strong>Email:</strong> {contactInfo.email}</p>
-              <p><strong>Phone:</strong> {contactInfo.phone}</p>
-              <p><strong>Address:</strong> {contactInfo.address}</p>
-              <p><strong>Working Hours:</strong> {contactInfo.workingHours}</p>
-            </div>
-            <img src="/images/contactuspage/cont1.png" alt="Contact Map" className="contact-image" />
+              
+              <ContactItem>
+                <ContactHeader>
+                  <i className="fa-regular fa-envelope"></i>
+                  <h3>Email</h3>
+                </ContactHeader>
+                <ContactValue>{contactInfo.email}</ContactValue>
+              </ContactItem>
+              
+              <Divider />
+              
+              <ContactItem>
+                <ContactHeader>
+                  <i className="fa-solid fa-phone"></i>
+                  <h3>Phone</h3>
+                </ContactHeader>
+                <ContactValue>{contactInfo.phone}</ContactValue>
+              </ContactItem>
+              
+              <Divider />
+              
+              <ContactItem>
+                <ContactHeader>
+                  <i className="fa-solid fa-location-dot"></i>
+                  <h3>Address</h3>
+                </ContactHeader>
+                <ContactValue>{contactInfo.address}</ContactValue>
+              </ContactItem>
+            </ContactInfoContent>
+            
+            <ContactImageContainer>
+              <img src="/images/contactuspage/cont1.png" alt="Contact Map" />
+            </ContactImageContainer>
           </ContactInfo>
         </ContactGrid>
       </ContentWrapper>

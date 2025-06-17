@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import AddToCartButton from './AddToCartButton';
 
-const ProductCardContainer = styled(Link)`
+const ProductCardShopContainer = styled.div`
   text-decoration: none;
   color: inherit;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  }
+  max-width: 300px;
+  margin: 0 auto;
 `;
 
 const ProductImage = styled.img`
@@ -74,7 +69,7 @@ const generateStars = (rating) => {
   return `${fullStars}${halfStar}${emptyStars}`;
 };
 
-const ProductCard = ({ product, className }) => {
+const ProductCardShop = ({ product, className }) => {
   const { t } = useTranslation();
   const defaultVariant = product.variants?.[0] || {};
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
@@ -102,7 +97,7 @@ const ProductCard = ({ product, className }) => {
   };
 
   return (
-    <ProductCardContainer to={`/shop/${product._id}`} className={className}>
+    <ProductCardShopContainer className={className}>
       <ProductImage 
         src={selectedVariant.image || product.mainImage} 
         alt={product.name} 
@@ -111,39 +106,38 @@ const ProductCard = ({ product, className }) => {
         <ProductName>{product.name}</ProductName>
         
         {/* Rating */}
-        
-              <div style={{ display: 'flex', alignItems: 'center', margin: '0.2rem 0', gap: '2px' }}>
-                  <span style={{ color: '#0F1111', fontSize: '0.9rem', fontWeight: '500' }}>
-                      {product.rating?.toFixed(1) || '0.0'}
-                  </span>
-                  <div style={{
-                      position: 'relative',
-                      display: 'inline-block',
-                      fontSize: '0.9rem',
-                      lineHeight: '1',
-                      color: '#ddd'
-                  }}>
-                      <span style={{ color: '#ddd' }}>★★★★★</span>
-                      <span style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          width: `${ratingPercentage}%`,
-                          color: '#FFA41C'
-                      }}>
-                          ★★★★★
-                      </span>
-                  </div>
-                  <span style={{ 
-                      fontSize: '0.8rem', 
-                      color: '#007185',
-                      textDecoration: 'none'
-                  }}>
-                      ({product.reviews || 0})
-                  </span>
-              </div>
+        <div style={{ display: 'flex', alignItems: 'center', margin: '0.2rem 0', gap: '2px' }}>
+          <span style={{ color: '#0F1111', fontSize: '0.9rem', fontWeight: '500' }}>
+            {product.rating?.toFixed(1) || '0.0'}
+          </span>
+          <div style={{
+            position: 'relative',
+            display: 'inline-block',
+            fontSize: '0.9rem',
+            lineHeight: '1',
+            color: '#ddd'
+          }}>
+            <span style={{ color: '#ddd' }}>★★★★★</span>
+            <span style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              width: `${ratingPercentage}%`,
+              color: '#FFA41C'
+            }}>
+              ★★★★★
+            </span>
+          </div>
+          <span style={{ 
+            fontSize: '0.8rem', 
+            color: '#007185',
+            textDecoration: 'none'
+          }}>
+            ({product.reviews || 0})
+          </span>
+        </div>
 
         {/* Variant Dropdown */}
         {product.variants?.length > 0 && (
@@ -224,7 +218,7 @@ const ProductCard = ({ product, className }) => {
                     fontSize: '0.9rem',
                     marginRight: '0.5rem'
                   }}>
-                                      MRP  ₹ {selectedVariant.originalPrice}
+                    MRP ₹ {selectedVariant.originalPrice}
                   </span>
                   <span style={{
                     color: '#2e7d32',
@@ -236,7 +230,7 @@ const ProductCard = ({ product, className }) => {
                 </>
               )}
             </div>
-            {/* <span style={{ 
+            <span style={{ 
               position: 'relative',
               display: 'inline-flex',
               alignItems: 'flex-start',
@@ -247,9 +241,10 @@ const ProductCard = ({ product, className }) => {
               transform: 'translateY(0.2em)'
             }}>
               ₹
-            </span> */}
+            </span>
           </div>
         </div>
+
 
         {/* Add to Cart Button */}
         <div style={{ marginTop: '0.3rem' }}>
@@ -258,7 +253,6 @@ const ProductCard = ({ product, className }) => {
             weight={selectedVariant.weight}
             variant={selectedVariant}
             style={{
-
               backgroundColor: '#FFD814',
               border: '1px solid #FCD200',
               borderRadius: '9999px',
@@ -292,8 +286,8 @@ const ProductCard = ({ product, className }) => {
           />
         </div>
       </ProductInfo>
-    </ProductCardContainer>
+    </ProductCardShopContainer>
   );
 };
 
-export default ProductCard;
+export default ProductCardShop;
