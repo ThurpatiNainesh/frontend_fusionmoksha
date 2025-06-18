@@ -7,7 +7,7 @@ import { setSearchQuery, setFilters } from '../store/searchSlice.js';
 import { logout } from '../store/authSlice.js';
 import { fetchCartItems, updateCartItemQuantity as updateCartQuantity, removeFromCart, updateItemQuantityOptimistic } from '../store/cartSlice.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faCartShopping, faUser, faTimes, faTrash, faPlus, faMinus, faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faCartShopping, faUser, faTimes, faTrash, faPlus, faMinus, faBars, faSearch, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import CartDrawerSkeleton from './CartDrawerSkeleton';
 
@@ -664,6 +664,33 @@ const LanguageSelect = styled.select`
   background: #fff;
 `;
 
+const ProfileDropdown = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  min-width: 150px;
+  z-index: 200;
+  overflow: hidden;
+  display: ${props => props.isOpen ? 'block' : 'none'};
+`;
+
+const ProfileDropdownItem = styled.div`
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &:hover {
+    background: #f5f5f5;
+    color: #faad14;
+  }
+`;
+
 const Header = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -673,8 +700,10 @@ const Header = () => {
   const [quantity, setQuantity] = useState(1);
   const [searchQuery, setSearchQueryLocal] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   
   // Close mobile menu when navigating to a new page
   const handleNavLinkClick = () => {
@@ -704,11 +733,25 @@ const Header = () => {
 
   const handleProfileClick = () => {
     if (isAuthenticated) {
-      window.location.href = '/profile';
+      setProfileDropdownOpen(!profileDropdownOpen);
     } else {
-      window.location.href = '/login';
+      navigate('/login');
     }
   };
+  
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownOpen && !event.target.closest('.profile-dropdown-container')) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [profileDropdownOpen]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -847,31 +890,25 @@ const Header = () => {
                   </div>
                 </div>
               </CartContainer>
-              <Icon 
-                icon={faUser} 
-                onClick={handleProfileClick} 
-                title={isAuthenticated ? 'My Profile' : 'Login/Register'}
-              />
-              {isAuthenticated && (
-                <button 
-                  onClick={handleLogout}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#333',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '4px',
-                    marginLeft: '0.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                >
-                  <span>Logout</span>
-                </button>
-              )}
+              <div className="profile-dropdown-container" style={{ position: 'relative' }}>
+                <Icon 
+                  icon={faUser} 
+                  onClick={handleProfileClick} 
+                  title={isAuthenticated ? 'My Profile' : 'Login/Register'}
+                />
+                {isAuthenticated && (
+                  <ProfileDropdown isOpen={profileDropdownOpen}>
+                    <ProfileDropdownItem onClick={() => navigate('/profile')}>
+                      <FontAwesomeIcon icon={faUser} />
+                      <span>My Profile</span>
+                    </ProfileDropdownItem>
+                    <ProfileDropdownItem onClick={handleLogout}>
+                      <FontAwesomeIcon icon={faSignOutAlt} />
+                      <span>Logout</span>
+                    </ProfileDropdownItem>
+                  </ProfileDropdown>
+                )}
+              </div>
             </HeaderIcons>
             
             <LanguageSelect

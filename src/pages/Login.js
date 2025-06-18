@@ -129,6 +129,9 @@ const Login = () => {
           <Button type="submit">Login</Button>
         </Form>
         <LinkText>
+          <RegisterLink href="#">Forgot Password?</RegisterLink>
+        </LinkText>
+        <LinkText>
           Don't have an account?{' '}
           <RegisterLink href="/register">Register</RegisterLink>
         </LinkText>
