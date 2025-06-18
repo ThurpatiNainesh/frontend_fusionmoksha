@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import ShopProductGrid from '../components/ShopProductGrid';
 import { getTopProducts } from '../store/productSlice';
 import ProductCard from '../components/ProductCard';
 import { featuredData } from '../data/featuredData';
@@ -95,9 +96,22 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <h2>Loading featured products...</h2>
-      </div>
+      <>
+        <div style={{ paddingTop: '10px', paddingBottom: '0.5rem' }}>
+          <CategorySection>
+            <CategoryImage src="/images/category/cat_03.png" alt="Category 1" />
+            <CategoryImage src="/images/category/cat_05.png" alt="Category 2" />
+            <CategoryImage src="/images/category/cat_07.png" alt="Category 3" />
+            <CategoryImage src="/images/category/cat_09.png" alt="Category 4" />
+            <CategoryImage src="/images/category/cat_11.png" alt="Category 5" />
+            <CategoryImage src="/images/category/cat_13.png" alt="Category 6" />
+          </CategorySection>
+        </div>
+        <div style={{ padding: '2rem' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Featured Products</h2>
+          <ShopProductGrid count={8} />
+        </div>
+      </>
     );
   }
 

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProducts } from '../store/productSlice';
 import ProductCard from '../components/ProductCard2';
+import ShopProductGrid from '../components/ShopProductGrid';
 
 // Helper function to generate star rating
 const generateStars = (rating) => {
@@ -73,9 +74,38 @@ const Shop = () => {
   
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <h2>Loading products...</h2>
-      </div>
+      <>
+        <div style={{
+          marginTop: '0.2rem',
+          width: '100vw',
+          position: 'relative',
+          left: '50%',
+          right: '50%',
+          marginLeft: '-50vw',
+          marginRight: '-50vw',
+          height: '360px',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/images/shop/shop_02.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <h1 style={{
+            color: '#fff',
+            fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+            margin: 0,
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+            zIndex: 3,
+            textAlign: 'center'
+          }}>{t('headingShop', 'Shop')}</h1>
+        </div>
+        
+        <div style={{ padding: '2rem' }}>
+          <ShopProductGrid count={6} />
+        </div>
+      </>
     );
   }
 

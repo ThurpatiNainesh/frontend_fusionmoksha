@@ -236,18 +236,6 @@ const ProductCard = ({ product, className }) => {
                 </>
               )}
             </div>
-            {/* <span style={{ 
-              position: 'relative',
-              display: 'inline-flex',
-              alignItems: 'flex-start',
-              fontSize: '0.7em',
-              color: '#2e7d32',
-              fontWeight: '500',
-              marginLeft: '2px',
-              transform: 'translateY(0.2em)'
-            }}>
-              ₹
-            </span> */}
           </div>
         </div>
 

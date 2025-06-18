@@ -7,8 +7,9 @@ import { setSearchQuery, setFilters } from '../store/searchSlice.js';
 import { logout } from '../store/authSlice.js';
 import { fetchCartItems, updateCartItemQuantity as updateCartQuantity, removeFromCart, updateItemQuantityOptimistic } from '../store/cartSlice.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faCartShopping, faUser, faTimes, faTrash, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faCartShopping, faUser, faTimes, faTrash, faPlus, faMinus, faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
+import CartDrawerSkeleton from './CartDrawerSkeleton';
 
 // Ensure Font Awesome CSS is imported
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -20,6 +21,15 @@ const IconContainer = styled.div`
   align-items: center;
   gap: 1.5rem;
   margin-left: 6rem;
+  
+  @media (max-width: 992px) {
+    margin-left: 2rem;
+    gap: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 1rem;
+  }
 `;
 
 const SearchIcon = styled(FontAwesomeIcon)`
@@ -43,6 +53,22 @@ const Icon = styled(FontAwesomeIcon)`
   
   &:hover {
     color: #faad14;
+  }
+`;
+
+const MobileSearchIcon = styled(FontAwesomeIcon)`
+  font-size: 1.2rem;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-right: 1rem;
+  
+  &:hover {
+    color: #faad14;
+  }
+  
+  @media (max-width: 768px) {
+    margin-right: 0.5rem;
   }
 `;
 
@@ -77,8 +103,16 @@ const CartDrawer = styled.div`
   display: flex;
   flex-direction: column;
   
+  @media (max-width: 768px) {
+    width: 350px;
+  }
+  
   @media (max-width: 480px) {
-    width: 320px;
+    width: 300px;
+  }
+  
+  @media (max-width: 360px) {
+    width: 280px;
   }
 `;
 
@@ -184,22 +218,19 @@ const CartDrawerFooter = styled.div`
   background-color: #f9f9f9;
 `;
 
-const CloseButton = styled.button`
+const CartCloseButton = styled.button`
   background: none;
   border: none;
+  color: #333;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #666;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: background-color 0.2s;
   
   &:hover {
-    background-color: #f0f0f0;
-    color: #333;
+    color: #faad14;
   }
 `;
 
@@ -288,7 +319,7 @@ const CartItemActions = styled.div`
 
 const SearchContainer = styled.div`
   position: relative;
-  display: none;
+  display: ${props => props.isVisible ? 'block' : 'none'};
   
   input {
     padding: 0.5rem 1rem;
@@ -299,10 +330,86 @@ const SearchContainer = styled.div`
   }
   
   @media (max-width: 768px) {
-    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    padding: 0.5rem;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 101;
+    
+    input {
+      width: 100%;
+    }
   }
 `;
 
+const SearchForm = styled.form`
+  display: flex;
+  align-items: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const StyledSearchInput = styled.input`
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 200px;
+  font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const SearchButton = styled.button`
+  background: #faad14;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  margin-left: -1px;
+  
+  &:hover {
+    background: #e69b00;
+  }
+`;
+
+const MobileCloseButton = styled.button`
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: #faad14;
+  }
+`;
+
+const MobileOverlay = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.isOpen ? 'block' : 'none'};
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 104;
+  }
+`;
 
 
 const HeaderWrapper = styled.header`
@@ -311,14 +418,26 @@ const HeaderWrapper = styled.header`
   position: sticky;
   top: 0;
   z-index: 100;
-  padding-bottom: 0.1rem;
+  padding: 0.8rem 0;
+  
+  @media (max-width: 768px) {
+    padding: 0.8rem 0;
+  }
 `;
 
 const Container = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: auto;
-  padding: 0.15rem;
+  padding: 0.5rem;
+  
+  @media (max-width: 1200px) {
+    padding: 0.5rem 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0.5rem 0.5rem;
+  }
 `;
 
 const Flex = styled.div`
@@ -327,6 +446,11 @@ const Flex = styled.div`
   justify-content: flex-start;
   margin: 0.05rem 0;
   width: 100%;
+  
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 `;
 
 const MainNav = styled.nav`
@@ -336,6 +460,74 @@ const MainNav = styled.nav`
   justify-content: flex-end;
   flex: 1;
   margin: 0 6rem;
+  
+  a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    
+    &:hover, &.active {
+      color: #faad14;
+    }
+  }
+  
+  @media (max-width: 1200px) {
+    margin: 0 2rem;
+    gap: 1.5rem;
+  }
+  
+  @media (max-width: 992px) {
+    margin: 0 1rem;
+    gap: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    z-index: 105;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 5rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    margin: 0;
+    gap: 1.5rem;
+    
+    &.mobile-open {
+      transform: translateX(0);
+    }
+    
+    a {
+      font-size: 1.2rem;
+      padding: 0.8rem 2rem;
+      width: 100%;
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    a {
+      font-size: 1.1rem;
+      padding: 0.7rem 1.5rem;
+    }
+  }
+  
+  .mobile-menu-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    display: none;
+    
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
 `;
 
 const LeftSection = styled.div`
@@ -343,6 +535,74 @@ const LeftSection = styled.div`
   align-items: flex-start;
   gap: 0.3rem;
   margin-right: 6rem;
+  
+  @media (max-width: 1200px) {
+    margin-right: 2rem;
+  }
+  
+  @media (max-width: 992px) {
+    margin-right: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    margin-right: 0;
+    justify-content: center;
+    width: 100%;
+  }
+`;
+
+const Logo = styled.div`
+  display: flex;
+  align-items: center;
+  
+  img {
+    height: 140px;
+    width: auto;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 102;
+  }
+  
+  @media (max-width: 992px) {
+    img {
+      height: 120px;
+      margin-bottom: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    img {
+      height: 100px;
+      margin-bottom: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    img {
+      height: 80px;
+      margin-bottom: 0.5rem;
+    }
+  }
+`;
+
+const MobileMenuToggle = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  
+  &:hover {
+    color: #faad14;
+  }
+  
+  @media (max-width: 768px) {
+    display: block;
+    order: -1;
+  }
 `;
 
 const SearchWrapper = styled.div`
@@ -369,13 +629,14 @@ const SearchInput = styled.input`
   }
 `;
 
-const Logo = styled.div`
+const LogoContainer = styled.div`
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.5rem;
   margin-bottom: -110px;
   position: relative;
   z-index: 101;
+  padding: 0.5rem 0;
 `;
 
 const Nav = styled.nav`
@@ -413,6 +674,22 @@ const Header = () => {
   const [searchQuery, setSearchQueryLocal] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Close mobile menu when navigating to a new page
+  const handleNavLinkClick = () => {
+    setMobileMenuOpen(false);
+  };
+  
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+  
+  // Close mobile menu when clicking outside
+  const handleOverlayClick = () => {
+    setMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -456,7 +733,9 @@ const Header = () => {
         sortBy: 'relevance'
       }));
       // Navigate to search results page
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      // Hide search after submission
+      setShowSearch(false);
     }
   };
   
@@ -490,104 +769,111 @@ const Header = () => {
 
   return (
     <HeaderWrapper>
+      <MobileOverlay isOpen={mobileMenuOpen} onClick={handleOverlayClick} />
+      
       <Container>
         <Flex>
           <LeftSection>
-            <Logo>
-              <NavLink to="/" end>
-                <img src="/images/mok1.2_03.png" alt="Fusion Moksha Logo" style={{ height: '140px', width: 'auto', marginBottom: '2rem', position: 'relative', zIndex: 102 }} />
-              </NavLink>
-            </Logo>
+            <LogoContainer>
+              <img src="/images/mok1.2_03.png" alt="Fusion Moksha" style={{ height: '120px', width: 'auto' }} />
+            </LogoContainer>
+            <MobileMenuToggle onClick={toggleMobileMenu}>
+              <FontAwesomeIcon icon={faBars} />
+            </MobileMenuToggle>
           </LeftSection>
-          <MainNav>
-            <NavLink to="/" exact>
-              {t('home')}
-            </NavLink>
-            <NavLink to="/about" end>
-              {t('about')}
-            </NavLink>
-            <NavLink to="/shop">
-              {t('shop')}
-            </NavLink>
-            <NavLink to="/contact">
-              {t('contact')}
-            </NavLink>
-            <IconContainer>
-              <SearchIcon 
-                icon={faMagnifyingGlass} 
-                onClick={() => setShowSearch(!showSearch)} 
-              />
-              <HeaderIcons>
-                <CartContainer>
-                  <div style={{ position: 'relative' }}>
-                    <div 
-                      style={{ color: 'inherit', cursor: 'pointer' }}
-                      onClick={() => {
-                        dispatch(fetchCartItems());
-                        setIsCartOpen(true);
-                      }}
-                    >
-                      <Icon icon={faCartShopping} />
-                      {cartItems.length > 0 && (
-                        <span style={{
-                          position: 'absolute',
-                          top: '-8px',
-                          right: '-8px',
-                          backgroundColor: '#ff4d4f',
-                          color: 'white',
-                          borderRadius: '50%',
-                          width: '18px',
-                          height: '18px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.7rem',
-                          fontWeight: 'bold'
-                        }}>
-                          {cartItems.length > 9 ? '9+' : cartItems.length}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </CartContainer>
-                <Icon 
-                  icon={faUser} 
-                  onClick={handleProfileClick} 
-                  title={isAuthenticated ? 'My Profile' : 'Login/Register'}
+          
+          <MainNav className={mobileMenuOpen ? 'mobile-open' : ''}>
+            <NavLink to="/" end onClick={handleNavLinkClick}>{t('home')}</NavLink>
+            <NavLink to="/about" end onClick={handleNavLinkClick}>{t('about')}</NavLink>
+            <NavLink to="/shop" onClick={handleNavLinkClick}>{t('shop')}</NavLink>
+            <NavLink to="/contact" onClick={handleNavLinkClick}>{t('contact')}</NavLink>
+            
+            {/* Close button for mobile menu */}
+            <MobileCloseButton className="mobile-menu-close" onClick={toggleMobileMenu}>
+              <FontAwesomeIcon icon={faTimes} />
+            </MobileCloseButton>
+          </MainNav>
+          
+          <IconContainer>
+            <MobileSearchIcon 
+              icon={faMagnifyingGlass} 
+              onClick={() => setShowSearch(!showSearch)} 
+            />
+            
+            <SearchContainer isVisible={showSearch}>
+              <SearchForm onSubmit={handleSearchSubmit}>
+                <StyledSearchInput 
+                  type="text" 
+                  placeholder={t('searchPlaceholder')} 
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                 />
-                {isAuthenticated && (
-                  <button 
-                    onClick={handleLogout}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#333',
-                      cursor: 'pointer',
-                      fontSize: '0.9rem',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '4px',
-                      marginLeft: '0.5rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      ':hover': {
-                        backgroundColor: '#f5f5f5',
-                      }
+                <SearchButton type="submit">
+                  <FontAwesomeIcon icon={faSearch} />
+                </SearchButton>
+              </SearchForm>
+            </SearchContainer>
+            
+            <HeaderIcons>
+              <CartContainer>
+                <div style={{ position: 'relative' }}>
+                  <div 
+                    style={{ color: 'inherit', cursor: 'pointer' }}
+                    onClick={() => {
+                      dispatch(fetchCartItems());
+                      setIsCartOpen(true);
                     }}
                   >
-                    <span>Logout</span>
-                  </button>
-                )}
-              </HeaderIcons>
-            </IconContainer>
-            <SearchContainer style={{ display: showSearch ? 'block' : 'none' }}>
-              <input 
-                type="text" 
-                placeholder={t('searchPlaceholder')}
-                value={searchQuery}
-                onChange={handleSearch}
+                    <Icon icon={faCartShopping} />
+                    {cartItems.length > 0 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-8px',
+                        right: '-8px',
+                        backgroundColor: '#ff4d4f',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.7rem',
+                        fontWeight: 'bold'
+                      }}>
+                        {cartItems.length > 9 ? '9+' : cartItems.length}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </CartContainer>
+              <Icon 
+                icon={faUser} 
+                onClick={handleProfileClick} 
+                title={isAuthenticated ? 'My Profile' : 'Login/Register'}
               />
-            </SearchContainer>
+              {isAuthenticated && (
+                <button 
+                  onClick={handleLogout}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#333',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    marginLeft: '0.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <span>Logout</span>
+                </button>
+              )}
+            </HeaderIcons>
+            
             <LanguageSelect
               value={i18n.language}
               onChange={(e) => i18n.changeLanguage(e.target.value)}
@@ -596,7 +882,7 @@ const Header = () => {
               <option value="hi">हिंदी</option>
               <option value="gu">ગુજરાતી</option>
             </LanguageSelect>
-          </MainNav>
+          </IconContainer>
         </Flex>
       </Container>
       
@@ -605,14 +891,14 @@ const Header = () => {
       <CartDrawer isOpen={isCartOpen}>
         <CartDrawerHeader>
           <CartDrawerTitle>{t('yourCart', 'Your Cart')}</CartDrawerTitle>
-          <CloseButton onClick={() => setIsCartOpen(false)}>
+          <CartCloseButton onClick={() => setIsCartOpen(false)}>
             <FontAwesomeIcon icon={faTimes} />
-          </CloseButton>
+          </CartCloseButton>
         </CartDrawerHeader>
         
         <CartDrawerContent>
           {cartLoading ? (
-            <div style={{ textAlign: 'center', padding: '2rem 0' }}>Loading...</div>
+            <CartDrawerSkeleton />
           ) : cartItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem 0', color: '#666' }}>
               <div style={{ fontSize: '3rem', color: '#e8e8e8', marginBottom: '1rem' }}>

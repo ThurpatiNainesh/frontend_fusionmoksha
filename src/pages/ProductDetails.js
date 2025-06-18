@@ -8,6 +8,7 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { getProductById } from '../store/productSlice';
 import ProductCardShop from '../components/ProductCardShop';
+import ProductDetailsSkeleton from '../components/ProductDetailsSkeleton';
 
 // Styled Components
 const Container = styled.div`
@@ -343,7 +344,7 @@ const ProductDetails = () => {
   useEffect(() => {
     dispatch(getProductById(id));
   }, [dispatch, id]);
-
+  
   // Show error toast if there's an error
   useEffect(() => {
     if (error) {
@@ -358,6 +359,10 @@ const ProductDetails = () => {
       setMainImage(product.variants[0].image || product.mainImage);
     }
   }, [product]);
+  
+  if (loading) {
+    return <ProductDetailsSkeleton />;
+  }
 
   const handleVariantChange = (e) => {
     const variantId = e.target.value;
