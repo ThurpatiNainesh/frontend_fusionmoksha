@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { getProductById } from '../store/productSlice';
+import { addToCart } from '../store/cartSlice';
 import ProductCardShop from '../components/ProductCardShop';
 import ProductDetailsSkeleton from '../components/ProductDetailsSkeleton';
 
@@ -388,9 +389,56 @@ const ProductDetails = () => {
     setQuantity(quantity + 1);
   };
 
-  const handleAddToCart = () => {
-    toast.success(`${quantity} ${product.name} added to cart`);
-    // Add your cart logic here
+  const handleAddToCart = async () => {
+    try {
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Please login to add items to cart');
+        navigate('/login');
+        return;
+      }
+
+      // Check if variant is selected
+      if (!selectedVariant) {
+        toast.error('Please select a product variant');
+        return;
+      }
+      
+      console.log('Selected variant:', selectedVariant);
+      
+      // Create weight object
+      let weightObj;
+      if (typeof selectedVariant.weight === 'object') {
+        // If weight is already an object with value and unit
+        weightObj = selectedVariant.weight;
+      } else {
+        // If weight is a number or string
+        weightObj = {
+          value: parseFloat(selectedVariant.weight) || 100,
+          unit: selectedVariant.unit || 'g'
+        };
+      }
+      
+      console.log('Adding to cart with data:', {
+        productId: product._id,
+        weight: weightObj,
+        quantity: quantity
+      });
+      
+      // Dispatch the addToCart action
+      const result = await dispatch(addToCart({
+        productId: product._id,
+        weight: weightObj,
+        quantity: quantity
+      })).unwrap();
+      
+      console.log('Cart response:', result);
+      toast.success(`${quantity} ${product.name} added to cart`);
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      toast.error(typeof error === 'string' ? error : 'Failed to add item to cart. Please try again.');
+    }
   };
 
   const handleBuyNow = () => {
