@@ -72,6 +72,15 @@ const productSlice = createSlice({
       state.filters = initialState.filters;
       state.searchQuery = '';
     },
+    // New reducer to update cart quantity for a specific product
+    updateProductCartQuantity: (state, action) => {
+      const { productId, cartQuantity } = action.payload;
+      // Find the product in the state and update its cartQuantity
+      const product = state.products.find(p => p._id === productId);
+      if (product) {
+        product.cartQuantity = cartQuantity;
+      }
+    },
   },
   extraReducers: (builder) => {
     // Get Products

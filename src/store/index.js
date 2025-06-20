@@ -3,6 +3,7 @@ import authReducer from './authSlice.js';
 import searchReducer from './searchSlice.js';
 import productReducer from './productSlice.js';
 import cartReducer from './cartSlice.js';
+import cartSyncMiddleware from './cartSyncMiddleware.js';
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }),
+    }).concat(cartSyncMiddleware),
 });
 
 export const RootState = store.getState();

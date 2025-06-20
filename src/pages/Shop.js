@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProducts } from '../store/productSlice';
-import ProductCard from '../components/ProductCard2';
+import ProductCard from '../components/ProductCard';
 import ShopProductGrid from '../components/ShopProductGrid';
 
 // Helper function to generate star rating
@@ -63,8 +63,29 @@ const Shop = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Fetch products when the page loads or when currentPage changes
   useEffect(() => {
     dispatch(getProducts({ page: currentPage, limit: 6 }));
+  }, [dispatch, currentPage]);
+  
+  // Refresh products when the component is focused (e.g., when navigating back to this page)
+  useEffect(() => {
+    // Function to refresh products
+    const refreshProducts = () => {
+      dispatch(getProducts({ page: currentPage, limit: 6 }));
+    };
+    
+    // Add event listener for when the page becomes visible again
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        refreshProducts();
+      }
+    });
+    
+    // Cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', refreshProducts);
+    };
   }, [dispatch, currentPage]);
 
   const handlePageChange = (page) => {

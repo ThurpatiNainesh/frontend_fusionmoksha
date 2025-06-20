@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -76,8 +77,27 @@ const generateStars = (rating) => {
 
 const ProductCard = ({ product, className }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const defaultVariant = product.variants?.[0] || {};
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
+  
+  // Get cart items from Redux store for synchronization purposes
+  const cartItems = useSelector(state => state.cart.items);
+  
+  // Find the current cart quantity for this product
+  const currentCartQuantity = useMemo(() => {
+    const cartItem = cartItems.find(item => {
+      const itemProductId = item.product?._id || item.product || item.productId;
+      return itemProductId === product._id;
+    });
+    return cartItem ? cartItem.quantity : (product.cartQuantity || 0);
+  }, [cartItems, product._id, product.cartQuantity]);
+  
+  // Create a product data object with the latest cart quantity
+  const productData = useMemo(() => ({
+    ...product,
+    cartQuantity: currentCartQuantity
+  }), [product, currentCartQuantity]);
   
   // Calculate rating percentage for stars
   const ratingPercentage = ((product.rating || 0) / 5) * 100;
@@ -254,7 +274,7 @@ const ProductCard = ({ product, className }) => {
         {/* Add to Cart Button */}
         <div style={{ marginTop: '0.3rem' }}>
           <AddToCartButton 
-            product={product} 
+            product={productData} 
             weight={selectedVariant.weight}
             variant={selectedVariant}
             style={{

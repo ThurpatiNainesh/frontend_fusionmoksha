@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, clearError } from '../store/authSlice.js';
+import { mergeGuestCart, getGuestCart, setIsGuest } from '../store/cartSlice.js';
+import { toast } from 'react-toastify';
 
 const Container = styled.div`
   display: flex;
@@ -87,22 +89,46 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { error, loading } = useSelector((state) => state.auth);
+  const { isGuest } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get returnUrl from location state if available
+  const returnUrl = location.state?.returnUrl || '/shop';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
+      // Check if there's a guest cart before login
+      const hasGuestCart = getGuestCart().length > 0;
+      
+      // Login the user
       await dispatch(login({ email, password })).unwrap();
-      navigate('/shop', { replace: true });
+      
+      // If there was a guest cart, merge it with the user's cart
+      if (hasGuestCart && isGuest) {
+        try {
+          const result = await dispatch(mergeGuestCart()).unwrap();
+          toast.success('Your guest cart items have been added to your account');
+        } catch (mergeError) {
+          toast.error('Failed to merge your guest cart: ' + mergeError);
+        }
+      }
+      
+      // Update guest status
+      dispatch(setIsGuest(false));
+      
+      // Navigate to returnUrl or default to shop
+      navigate(returnUrl, { replace: true });
     } catch (error) {
       // Error is already handled by the auth slice
     }
   };
 
   // Clear any previous errors when component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 

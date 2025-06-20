@@ -5,11 +5,21 @@ import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSearchQuery, setFilters } from '../store/searchSlice.js';
 import { logout } from '../store/authSlice.js';
-import { fetchCartItems, updateCartItemQuantity as updateCartQuantity, removeFromCart, updateItemQuantityOptimistic } from '../store/cartSlice.js';
+import { 
+  fetchCartItems, 
+  updateCartItemQuantity as updateCartQuantity, 
+  removeFromCart, 
+  updateItemQuantityOptimistic,
+  removeItemFromGuestCart,
+  updateGuestItemQuantity,
+  fetchProductDetails
+} from '../store/cartSlice.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faCartShopping, faUser, faTimes, faTrash, faPlus, faMinus, faBars, faSearch, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import CartDrawerSkeleton from './CartDrawerSkeleton';
+import axios from 'axios';
+import SideCheckout from './SideCheckout.js';
 
 // Ensure Font Awesome CSS is imported
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -696,7 +706,8 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cart);
+  const { items: cartItems, loading: cartLoading, isGuest } = useSelector((state) => state.cart);
+  const [productCache, setProductCache] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [searchQuery, setSearchQueryLocal] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -725,6 +736,50 @@ const Header = () => {
       dispatch(fetchCartItems());
     }
   }, [dispatch, isAuthenticated]);
+  
+  // Fetch product details for guest cart items if needed
+  useEffect(() => {
+    const fetchMissingProductDetails = async () => {
+      if (!isAuthenticated && isGuest && cartItems.length > 0) {
+        const itemsNeedingDetails = cartItems.filter(item => 
+          !item.productName || !item.image
+        );
+        
+        for (const item of itemsNeedingDetails) {
+          // Check if we already have this product in cache
+          if (!productCache[item.productId]) {
+            try {
+              // Fetch product details from API
+              const productId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+              const response = await axios.get(`https://fusionmokshabackend-production.up.railway.app/api/products/${productId}`);
+              const productData = response.data;
+              
+              // Update cache
+              setProductCache(prev => ({
+                ...prev,
+                [productId]: productData
+              }));
+              
+              // Update the item in cart with product details
+              dispatch(fetchProductDetails({
+                itemId: item._id,
+                productDetails: {
+                  productName: productData.name,
+                  image: productData.mainImage,
+                  price: item.price || productData.variants[0]?.price,
+                  originalPrice: item.originalPrice || productData.variants[0]?.originalPrice
+                }
+              }));
+            } catch (error) {
+              console.error(`Failed to fetch product details for ${item.productId}:`, error);
+            }
+          }
+        }
+      }
+    };
+    
+    fetchMissingProductDetails();
+  }, [cartItems, isAuthenticated, isGuest, productCache, dispatch]);
 
   const handleSearch = (e) => {
     setSearchQueryLocal(e.target.value);
@@ -784,30 +839,42 @@ const Header = () => {
   
   // Cart item quantity and remove functions
   const handleUpdateCartQuantity = (itemId, currentQuantity, change) => {
-    // Optimistically update the UI first
-    dispatch(updateItemQuantityOptimistic({ itemId, change }));
-    
-    // Then dispatch the async thunk to update on the server
-    dispatch(updateCartQuantity({ itemId, change }))
-      .unwrap()
-      .then(() => {
-        toast.success('Cart updated');
-      })
-      .catch((error) => {
-        toast.error('Failed to update cart: ' + error);
-      });
+    if (isAuthenticated) {
+      // Optimistically update the UI first
+      dispatch(updateItemQuantityOptimistic({ itemId, change }));
+      
+      // Then dispatch the async thunk to update on the server
+      dispatch(updateCartQuantity({ itemId, change }))
+        .unwrap()
+        .then(() => {
+          toast.success('Cart updated');
+        })
+        .catch((error) => {
+          toast.error('Failed to update cart: ' + error);
+        });
+    } else {
+      // For guest users, update in localStorage
+      dispatch(updateGuestItemQuantity({ itemId, change }));
+      toast.success('Cart updated');
+    }
   };
   
   const removeCartItem = (itemId) => {
-    // Dispatch action to remove item from cart
-    dispatch(removeFromCart(itemId))
-      .unwrap()
-      .then(() => {
-        toast.success('Item removed from cart');
-      })
-      .catch((error) => {
-        toast.error('Failed to remove item: ' + error);
-      });
+    if (isAuthenticated) {
+      // Dispatch action to remove item from cart for authenticated users
+      dispatch(removeFromCart(itemId))
+        .unwrap()
+        .then(() => {
+          toast.success('Item removed from cart');
+        })
+        .catch((error) => {
+          toast.error('Failed to remove item: ' + error);
+        });
+    } else {
+      // For guest users, remove from localStorage
+      dispatch(removeItemFromGuestCart(itemId));
+      toast.success('Item removed from cart');
+    }
   };
 
   return (
@@ -863,7 +930,9 @@ const Header = () => {
                   <div 
                     style={{ color: 'inherit', cursor: 'pointer' }}
                     onClick={() => {
-                      dispatch(fetchCartItems());
+                      if (isAuthenticated) {
+                        dispatch(fetchCartItems());
+                      }
                       setIsCartOpen(true);
                     }}
                   >
@@ -923,115 +992,12 @@ const Header = () => {
         </Flex>
       </Container>
       
-      {/* Cart Side Drawer */}
-      <CartDrawerOverlay isOpen={isCartOpen} onClick={() => setIsCartOpen(false)} />
-      <CartDrawer isOpen={isCartOpen}>
-        <CartDrawerHeader>
-          <CartDrawerTitle>{t('yourCart', 'Your Cart')}</CartDrawerTitle>
-          <CartCloseButton onClick={() => setIsCartOpen(false)}>
-            <FontAwesomeIcon icon={faTimes} />
-          </CartCloseButton>
-        </CartDrawerHeader>
-        
-        <CartDrawerContent>
-          {cartLoading ? (
-            <CartDrawerSkeleton />
-          ) : cartItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem 0', color: '#666' }}>
-              <div style={{ fontSize: '3rem', color: '#e8e8e8', marginBottom: '1rem' }}>
-                <FontAwesomeIcon icon={faCartShopping} />
-              </div>
-              {t('emptyCart', 'Your cart is empty')}
-              <div style={{ marginTop: '1rem' }}>
-                <CartButton onClick={() => {
-                  setIsCartOpen(false);
-                  navigate('/shop');
-                }}>
-                  {t('continueShopping', 'Continue Shopping')}
-                </CartButton>
-              </div>
-            </div>
-          ) : (
-            <>
-              {cartItems.map((item) => (
-                <CartItem key={item._id}>
-                  <CartItemImage 
-                    src={item.image || item.productId?.mainImage || '/images/placeholder.png'} 
-                    alt={item.name || item.productId?.name}
-                  />
-                  <CartItemDetails>
-                    <CartItemName>{item.name || item.productId?.name}</CartItemName>
-                    <div style={{ fontSize: '0.85rem', fontWeight: '500', color: '#555', marginBottom: '0.25rem' }}>Organic Product</div>
-                    <CartItemWeight>{item.weight ? `${item.weight.value}${item.weight.unit}` : '250g'}</CartItemWeight>
-                    
-                    <CartItemPriceWrapper>
-                      <CartItemQuantity>
-                        <QuantityButton 
-                          disabled={item.quantity <= 1}
-                          onClick={() => handleUpdateCartQuantity(item._id, item.quantity, -1)}
-                        >
-                          <FontAwesomeIcon icon={faMinus} />
-                        </QuantityButton>
-                        <QuantityValue>{item.quantity}</QuantityValue>
-                        <QuantityButton
-                          onClick={() => handleUpdateCartQuantity(item._id, item.quantity, 1)}
-                        >
-                          <FontAwesomeIcon icon={faPlus} />
-                        </QuantityButton>
-                      </CartItemQuantity>
-                      
-                      <CartItemPrice>
-                        {item.originalPrice && item.originalPrice > item.price ? (
-                          <>
-                            <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '5px', fontSize: '0.85rem' }}>₹{item.originalPrice}</span>
-                            <span style={{ color: 'black', fontWeight: '600' }}>₹{item.price}</span>
-                          </>
-                        ) : (
-                          <span>₹{item.price}</span>
-                        )}
-                      </CartItemPrice>
-                    </CartItemPriceWrapper>
-                  </CartItemDetails>
-                  
-                  <RemoveButton
-                    onClick={() => removeCartItem(item._id)}
-                    title="Remove item"
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </RemoveButton>
-                </CartItem>
-              ))}
-              
-              {/* Subtotal section and buttons moved right after product list */}
-              <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '1rem', marginTop: '1rem' }}>
-                <CartTotal style={{ margin: '0.5rem 0 1rem' }}>
-                  <span>{t('subtotal', 'Subtotal')}:</span>
-                  <span>₹{cartItems.reduce((total, item) => total + (item.price || item.product?.price || 0) * item.quantity, 0).toFixed(2)}</span>
-                </CartTotal>
-                
-                <CartButton 
-                  onClick={() => {
-                    setIsCartOpen(false);
-                    navigate('/checkout');
-                  }}
-                  style={{ backgroundColor: 'green', marginTop: '0.5rem' }}
-                >
-                  {t('proceedToCheckout', 'Checkout')}
-                </CartButton>
-                
-                {/* <CartButton 
-                  onClick={() => setIsCartOpen(false)}
-                  style={{ backgroundColor: '#8c8c8c', marginTop: '0.5rem' }}
-                >
-                  {t('continueShopping', 'Continue Shopping')}
-                </CartButton> */}
-              </div>
-            </>
-          )}
-        </CartDrawerContent>
-        
-        {/* Footer removed as content was moved into the cart content area */}
-      </CartDrawer>
+      {/* Integrated Checkout Sidebar */}
+      <SideCheckout 
+        isOpen={isCartOpen} 
+        onClose={() => setIsCartOpen(false)} 
+        productCache={productCache}
+      />
     </HeaderWrapper>
   );
 };

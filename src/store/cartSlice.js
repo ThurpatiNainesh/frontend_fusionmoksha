@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const API_URL = 'https://fusionmokshabackend-production.up.railway.app/api/cart';
+const GUEST_CART_KEY = 'fusionmoksha_guest_cart';
+const AUTH_USER_CART_KEY = 'fusionmoksha_auth_cart';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -35,13 +37,40 @@ const handleApiError = (error) => {
   }
 };
 
+// Helper function to save authenticated user's cart in localStorage
+const saveAuthUserCart = (cartItems) => {
+  try {
+    localStorage.setItem(AUTH_USER_CART_KEY, JSON.stringify(cartItems));
+  } catch (error) {
+    console.error('Error saving authenticated user cart:', error);
+  }
+};
+
+// Helper function to get authenticated user's cart from localStorage
+const getAuthUserCart = () => {
+  try {
+    const authUserCartJSON = localStorage.getItem(AUTH_USER_CART_KEY);
+    return authUserCartJSON ? JSON.parse(authUserCartJSON) : [];
+  } catch (error) {
+    console.error('Error getting authenticated user cart:', error);
+    return [];
+  }
+};
+
 // Async thunks
 export const fetchCartItems = createAsyncThunk(
   'cart/fetchCartItems',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
+      const { auth } = getState();
+      const isAuthenticated = auth.isAuthenticated;
+      
+      // Set up authentication if user is logged in
       setupAxiosAuth();
-      const response = await axios.get(API_URL);
+      
+      // For both authenticated and guest users, fetch from API
+      // The backend API handles both cases with the optionalAuth middleware
+      const response = await axios.get('https://fusionmokshabackend-production.up.railway.app/api/cart');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -54,7 +83,7 @@ export const addToCart = createAsyncThunk(
   async ({ productId, weight, quantity }, { rejectWithValue }) => {
     try {
       setupAxiosAuth();
-      const response = await axios.post(API_URL, { productId, weight, quantity });
+      const response = await axios.post('https://fusionmokshabackend-production.up.railway.app/api/cart', { productId, weight, quantity });
       return response.data;
     } catch (error) {
       return rejectWithValue(handleApiError(error));
@@ -71,7 +100,7 @@ export const updateCartItemQuantity = createAsyncThunk(
       // If change is -1, we need to check current quantity first
       if (change === -1) {
         // Get current cart items to find the current quantity
-        const cartResponse = await axios.get(API_URL);
+        const cartResponse = await axios.get('https://fusionmokshabackend-production.up.railway.app/api/cart');
         const currentItem = cartResponse.data.find(item => item._id === itemId);
         
         if (currentItem && currentItem.quantity === 1) {
@@ -82,7 +111,7 @@ export const updateCartItemQuantity = createAsyncThunk(
       }
       
       // Otherwise, update the quantity
-      const response = await axios.put(`${API_URL}/${itemId}`, { change });
+      const response = await axios.put(`https://fusionmokshabackend-production.up.railway.app/api/cart/${itemId}`, { change });
       return response.data;
     } catch (error) {
       return rejectWithValue(handleApiError(error));
@@ -95,7 +124,7 @@ export const removeFromCart = createAsyncThunk(
   async (itemId, { rejectWithValue }) => {
     try {
       setupAxiosAuth();
-      await axios.delete(`${API_URL}/${itemId}`);
+      await axios.delete(`https://fusionmokshabackend-production.up.railway.app/api/cart/${itemId}`);
       return itemId; // Return the ID of the removed item
     } catch (error) {
       return rejectWithValue(handleApiError(error));
@@ -103,14 +132,161 @@ export const removeFromCart = createAsyncThunk(
   }
 );
 
+// Merge guest cart with user cart after login
+// Update cart quantity API thunk
+export const updateCartQuantityApi = createAsyncThunk(
+  'cart/updateCartQuantityApi',
+  async ({ productId, weight, action, quantity }, { getState, rejectWithValue, dispatch }) => {
+    try {
+      // Set up authentication if user is logged in
+      setupAxiosAuth();
+      
+      // For both authenticated and guest users, use the API
+      // The backend API handles both cases with the optionalAuth middleware
+      const response = await axios.post('https://fusionmokshabackend-production.up.railway.app/api/cart/update-quantity', {
+        productId,
+        weight,
+        action,
+        quantity // Pass the exact quantity if provided
+      });
+      
+      // After successful update, immediately fetch the latest cart data
+      // This ensures the Redux store has the most up-to-date information
+      try {
+        await dispatch(fetchCartItems()).unwrap();
+      } catch (fetchError) {
+        console.error('Error fetching cart after update:', fetchError);
+      }
+      
+      return {
+        success: true,
+        productId,
+        weight,
+        action,
+        quantity // Include the exact quantity in the response
+        // Not using backend cartQuantity as requested
+      };
+    } catch (error) {
+      return rejectWithValue({
+        error: error.response?.data?.message || 'Failed to update cart',
+        productId,
+        weight
+      });
+    }
+  }
+);
+
+export const mergeGuestCart = createAsyncThunk(
+  'cart/mergeGuestCart',
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      // Get guest cart from localStorage
+      const guestCartJSON = localStorage.getItem(GUEST_CART_KEY);
+      if (!guestCartJSON) {
+        return { success: true, message: 'No guest cart to merge' };
+      }
+      
+      const guestCart = JSON.parse(guestCartJSON);
+      if (!guestCart || !Array.isArray(guestCart) || guestCart.length === 0) {
+        localStorage.removeItem(GUEST_CART_KEY);
+        return { success: true, message: 'No guest cart items to merge' };
+      }
+      
+      setupAxiosAuth();
+      const response = await axios.post(`https://fusionmokshabackend-production.up.railway.app/api/cart/merge`, { guestCart });
+      
+      // Clear guest cart after successful merge
+      localStorage.removeItem(GUEST_CART_KEY);
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error));
+    }
+  }
+);
+
+// Helper functions for guest cart
+export const getGuestCart = () => {
+  try {
+    const guestCartJSON = localStorage.getItem(GUEST_CART_KEY);
+    return guestCartJSON ? JSON.parse(guestCartJSON) : [];
+  } catch (error) {
+    console.error('Error getting guest cart:', error);
+    return [];
+  }
+};
+
+export const saveGuestCart = (cartItems) => {
+  try {
+    localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cartItems));
+  } catch (error) {
+    console.error('Error saving guest cart:', error);
+  }
+};
+
+export const addToGuestCart = (item) => {
+  const guestCart = getGuestCart();
+  
+  // Check if item already exists in cart
+  const existingItemIndex = guestCart.findIndex(
+    (cartItem) => 
+      cartItem.productId === item.productId && 
+      cartItem.weight.value === item.weight.value &&
+      cartItem.weight.unit === item.weight.unit
+  );
+  
+  if (existingItemIndex >= 0) {
+    // Update quantity if item exists
+    guestCart[existingItemIndex].quantity += item.quantity;
+  } else {
+    // Add new item to cart
+    guestCart.push(item);
+  }
+  
+  saveGuestCart(guestCart);
+  return guestCart;
+};
+
+export const removeFromGuestCart = (itemId) => {
+  const guestCart = getGuestCart();
+  const updatedCart = guestCart.filter(item => item._id !== itemId);
+  saveGuestCart(updatedCart);
+  return updatedCart;
+};
+
+export const updateGuestCartItemQuantity = (itemId, change) => {
+  const guestCart = getGuestCart();
+  const itemIndex = guestCart.findIndex(item => item._id === itemId);
+  
+  if (itemIndex !== -1) {
+    const newQuantity = guestCart[itemIndex].quantity + change;
+    if (newQuantity <= 0) {
+      // Remove item if quantity becomes 0 or negative
+      return removeFromGuestCart(itemId);
+    } else {
+      // Update quantity
+      guestCart[itemIndex].quantity = newQuantity;
+      saveGuestCart(guestCart);
+    }
+  }
+  
+  return guestCart;
+};
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
     items: [],
-    loading: false,
+    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
-    success: false,
-    updatingItems: {}, // Track which items are being updated
+    isGuest: !localStorage.getItem('token'), // Track if user is guest
+    total: 0,
+    subtotal: 0,
+    tax: 0,
+    shipping: 0,
+    lastSyncTime: null, // Track when we last synced with the backend
+    updatingItems: {}, // Track items being updated
+    productCache: {}, // Cache for product details
   },
   reducers: {
     clearCart: (state) => {
@@ -119,7 +295,81 @@ const cartSlice = createSlice({
       state.error = null;
       state.success = false;
       state.updatingItems = {};
+      
+      // Clear guest cart if user is guest
+      if (state.isGuest) {
+        localStorage.removeItem(GUEST_CART_KEY);
+      }
     },
+    
+    setIsGuest: (state, action) => {
+      state.isGuest = action.payload;
+    },
+    
+    loadGuestCart: (state) => {
+      if (state.isGuest) {
+        const guestCart = getGuestCart();
+        state.items = guestCart;
+      }
+    },
+    
+    addItemToGuestCart: (state, action) => {
+      if (state.isGuest) {
+        const guestCart = addToGuestCart(action.payload);
+        state.items = guestCart;
+        state.success = true;
+      }
+    },
+    
+    removeItemFromGuestCart: (state, action) => {
+      if (state.isGuest) {
+        const guestCart = removeFromGuestCart(action.payload);
+        state.items = guestCart;
+      }
+    },
+    
+    updateGuestItemQuantity: (state, action) => {
+      if (state.isGuest) {
+        const { itemId, change } = action.payload;
+        const guestCart = updateGuestCartItemQuantity(itemId, change);
+        state.items = guestCart;
+      }
+    },
+    
+    // Update a guest cart item with product details
+    fetchProductDetails: (state, action) => {
+      const { itemId, productDetails } = action.payload;
+      const itemIndex = state.items.findIndex(item => item._id === itemId);
+      
+      if (itemIndex !== -1) {
+        // Update the item with product details
+        state.items[itemIndex] = {
+          ...state.items[itemIndex],
+          ...productDetails
+        };
+        
+        // Update the item in localStorage
+        if (state.isGuest) {
+          const guestCart = getGuestCart();
+          const guestItemIndex = guestCart.findIndex(item => item._id === itemId);
+          
+          if (guestItemIndex !== -1) {
+            guestCart[guestItemIndex] = {
+              ...guestCart[guestItemIndex],
+              ...productDetails
+            };
+            saveGuestCart(guestCart);
+          }
+        }
+        
+        // Add to product cache
+        state.productCache = {
+          ...state.productCache,
+          [state.items[itemIndex].productId]: productDetails
+        };
+      }
+    },
+    
     resetCartStatus: (state) => {
       state.loading = false;
       state.error = null;
@@ -163,6 +413,128 @@ const cartSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Update cart quantity API
+    builder.addCase(updateCartQuantityApi.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(updateCartQuantityApi.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      state.error = null;
+      
+      // Clear the optimistic update flag
+      if (action.payload.optimisticUpdateId) {
+        const itemToUpdate = state.items.find(item => 
+          item.optimisticUpdateId === action.payload.optimisticUpdateId
+        );
+        if (itemToUpdate) {
+          itemToUpdate.updating = false;
+          delete itemToUpdate.optimisticUpdateId;
+        }
+      }
+      
+      if (action.payload.success) {
+        // If we have an explicit quantity value, use it directly
+        if (action.payload.quantity !== undefined) {
+          // Find the item in the cart with matching productId and weight
+          const itemIndex = state.items.findIndex(item => {
+            const itemProductId = item.product?._id || item.product || item.productId;
+            return itemProductId === action.payload.productId &&
+              item.weight?.value === action.payload.weight?.value && 
+              item.weight?.unit === action.payload.weight?.unit;
+          });
+          
+          if (itemIndex !== -1) {
+            // Update the quantity with the exact value we specified
+            state.items[itemIndex].quantity = action.payload.quantity;
+            
+            // If quantity is 0, remove the item from the cart
+            if (action.payload.quantity === 0) {
+              state.items = state.items.filter((_, index) => index !== itemIndex);
+            }
+          }
+        }
+        // For authenticated users, the API returns the updated cartQuantity
+        else if (action.payload.cartQuantity !== undefined) {
+          // Find the item in the cart with matching productId and weight
+          const itemIndex = state.items.findIndex(item => {
+            const itemProductId = item.product?._id || item.product || item.productId;
+            return itemProductId === action.payload.productId &&
+              item.weight?.value === action.payload.weight?.value && 
+              item.weight?.unit === action.payload.weight?.unit;
+          });
+          
+          if (itemIndex !== -1) {
+            // Update the quantity with the exact value from the backend
+            state.items[itemIndex].quantity = action.payload.cartQuantity;
+            
+            // If quantity is 0, remove the item from the cart
+            if (action.payload.cartQuantity === 0) {
+              state.items = state.items.filter((_, index) => index !== itemIndex);
+            }
+          } else if (action.payload.cartQuantity > 0) {
+            // If the item doesn't exist in the cart but has a quantity > 0,
+            // we'll need to fetch the full cart to get the complete item details
+            // This is handled by the fetchCartItems thunk which will be called after this
+          }
+        } 
+        // For guest users, handle the cart state locally
+        else if (state.isGuest) {
+          const { productId, weight, action: cartAction } = action.payload;
+          const itemId = `${productId}-${weight.value}-${weight.unit}`;
+          
+          // Find the item in the guest cart
+          const itemIndex = state.items.findIndex(item => item._id === itemId);
+          
+          if (itemIndex !== -1) {
+            // Update the quantity based on the action
+            if (cartAction === 'increment') {
+              state.items[itemIndex].quantity += 1;
+            } else if (cartAction === 'decrement') {
+              state.items[itemIndex].quantity -= 1;
+              
+              // Remove the item if quantity reaches 0
+              if (state.items[itemIndex].quantity <= 0) {
+                state.items = state.items.filter((_, index) => index !== itemIndex);
+              }
+            }
+            
+            // Update localStorage
+            saveGuestCart(state.items);
+          }
+        }
+        
+        // Update the lastSyncTime to track when we last got data from the backend
+        state.lastSyncTime = Date.now();
+      }
+    });
+    builder.addCase(updateCartQuantityApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    
+    // Merge guest cart
+    builder.addCase(mergeGuestCart.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(mergeGuestCart.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = null;
+      
+      // If the API returns updated cart items, update the state
+      if (action.payload.cart && Array.isArray(action.payload.cart)) {
+        state.items = action.payload.cart;
+      }
+      
+      // Clear guest cart status
+      state.isGuest = false;
+    });
+    builder.addCase(mergeGuestCart.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    
     // Fetch cart items
     builder.addCase(fetchCartItems.pending, (state) => {
       state.loading = true;
@@ -268,6 +640,12 @@ export const {
   clearCart, 
   resetCartStatus, 
   updateItemQuantityOptimistic, 
-  revertItemQuantity 
+  revertItemQuantity,
+  setIsGuest,
+  loadGuestCart,
+  addItemToGuestCart,
+  removeItemFromGuestCart,
+  updateGuestItemQuantity,
+  fetchProductDetails
 } = cartSlice.actions;
 export default cartSlice.reducer;

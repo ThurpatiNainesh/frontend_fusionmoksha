@@ -4,13 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPlus, faMinus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPlus, faMinus, faArrowLeft, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { 
   fetchCartItems, 
   removeFromCart, 
   updateCartItemQuantity,
   updateItemQuantityOptimistic,
-  revertItemQuantity
+  revertItemQuantity,
+  loadGuestCart,
+  removeItemFromGuestCart,
+  updateGuestItemQuantity
 } from '../store/cartSlice';
 
 const CartContainer = styled.div`
@@ -260,14 +263,17 @@ const Cart = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { items, loading, error } = useSelector((state) => state.cart);
+  const { items, loading, error, isGuest } = useSelector((state) => state.cart);
   const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchCartItems());
+    } else if (isGuest) {
+      // Load cart from localStorage for guest users
+      dispatch(loadGuestCart());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isAuthenticated, isGuest]);
 
   const handleQuantityChange = (itemId, newQuantity) => {
     if (newQuantity < 1) return;
@@ -277,22 +283,31 @@ const Cart = () => {
     const change = newQuantity - currentItem.quantity;
     if (change === 0) return;
     
-    // Optimistically update the UI
-    dispatch(updateItemQuantityOptimistic({ itemId, change }));
-    
-    // Make the API call
-    dispatch(updateCartItemQuantity({ itemId, change }))
-      .then((result) => {
-        if (result.error) {
-          // Revert the optimistic update if the API call fails
-          dispatch(revertItemQuantity({ itemId }));
-        }
-      });
+    if (isAuthenticated) {
+      // Optimistically update the UI
+      dispatch(updateItemQuantityOptimistic({ itemId, change }));
+      
+      // Make the API call
+      dispatch(updateCartItemQuantity({ itemId, change }))
+        .then((result) => {
+          if (result.error) {
+            // Revert the optimistic update if the API call fails
+            dispatch(revertItemQuantity({ itemId }));
+          }
+        });
+    } else {
+      // Update guest cart in localStorage
+      dispatch(updateGuestItemQuantity({ itemId, change }));
+    }
   };
 
   const handleRemoveItem = (itemId) => {
     if (window.confirm(t('cart.removeConfirm', 'Are you sure you want to remove this item?'))) {
-      dispatch(removeFromCart(itemId));
+      if (isAuthenticated) {
+        dispatch(removeFromCart(itemId));
+      } else {
+        dispatch(removeItemFromGuestCart(itemId));
+      }
     }
   };
 
@@ -306,21 +321,8 @@ const Cart = () => {
     return subtotal;
   };
 
-  if (!isAuthenticated) {
-    return (
-      <CartContainer>
-        <EmptyCart>
-          <EmptyCartTitle>{t('cart.loginRequired', 'Please log in to view your cart')}</EmptyCartTitle>
-          <EmptyCartText>
-            {t('cart.loginToView', 'You need to be logged in to view your shopping cart.')}
-          </EmptyCartText>
-          <ShopButton onClick={() => navigate('/login')}>
-            {t('login', 'Log In')}
-          </ShopButton>
-        </EmptyCart>
-      </CartContainer>
-    );
-  }
+  // Guest users can view their cart without logging in
+  // We'll only show a login prompt if they try to checkout
 
   if (loading && items.length === 0) {
     return (
@@ -478,7 +480,20 @@ const Cart = () => {
             <span>₹{calculateTotal().toFixed(2)}</span>
           </SummaryRow>
           <CheckoutButton 
-            onClick={() => navigate('/checkout')}
+            onClick={() => {
+              if (isAuthenticated) {
+                navigate('/checkout');
+              } else {
+                // For guest users, prompt to login or continue as guest
+                if (window.confirm(t('cart.loginPrompt', 'Would you like to log in to continue? Click OK to log in or Cancel to continue as a guest.'))) {
+                  // Navigate to login with return URL
+                  navigate('/login', { state: { returnUrl: '/checkout' } });
+                } else {
+                  // Continue as guest
+                  navigate('/checkout');
+                }
+              }
+            }}
             disabled={loading}
           >
             {loading ? t('loading', 'Loading...') : t('cart.proceedToCheckout', 'Proceed to Checkout')}
