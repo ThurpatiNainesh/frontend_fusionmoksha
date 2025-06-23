@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
@@ -339,9 +339,14 @@ const CartItemPrice = styled.div`
 // Main component
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { items, loading, isGuest } = useSelector(state => state.cart);
   const { isAuthenticated, user } = useSelector(state => state.auth);
+  
+  // Check if this is a Buy Now checkout
+  const isBuyNow = location.state?.isBuyNow || false;
+  const buyNowProduct = location.state?.buyNowProduct || null;
   
   // State for checkout process
   const [step, setStep] = useState(1); // 1: Address, 2: Payment, 3: Confirmation
@@ -490,48 +495,95 @@ const Checkout = () => {
           throw new Error('Selected address not found');
         }
         
-        // Format cart items for the API
-        const formattedCartItems = items.map(item => ({
-          productId: item.productId,
-          weight: {
-            value: item.weight.value,
-            unit: item.weight.unit
-          },
-          quantity: item.quantity
-        }));
+        // Format address for API
+        const formattedAddress = {
+          name: selectedAddressDetails.fullName,
+          phone: selectedAddressDetails.phone,
+          address: `${selectedAddressDetails.addressLine1} ${selectedAddressDetails.addressLine2 || ''}`.trim(),
+          pincode: selectedAddressDetails.pincode,
+          city: selectedAddressDetails.city,
+          state: selectedAddressDetails.state
+        };
         
-        // For authenticated users - call the backend API
-        const response = await fetch('https://fusionmokshabackend-production.up.railway.app/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            cartItems: formattedCartItems,
-            address: selectedAddressDetails,
-            paymentMethod: paymentMethod.toUpperCase() // Backend expects 'COD' or 'ONLINE'
-          })
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to create order');
-        }
-        
-        orderData = await response.json();
-        
-        // Store the order ID in localStorage for payment processing
-        if (orderData.data && orderData.data.orderId) {
-          localStorage.setItem('currentOrderId', orderData.data.orderId);
-          setOrderId(orderData.data.orderId);
+        // Check if this is a Buy Now checkout or regular cart checkout
+        if (isBuyNow && buyNowProduct) {
+          // For Buy Now - call the buy-now API endpoint
+          const response = await fetch('https://fusionmokshabackend-production.up.railway.app/api/orders/buy-now', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              product: {
+                productId: buyNowProduct.productId,
+                weight: buyNowProduct.weight,
+                quantity: buyNowProduct.quantity
+              },
+              address: formattedAddress,
+              paymentMethod: paymentMethod.toUpperCase() // Backend expects 'COD' or 'ONLINE'
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to create order');
+          }
+          
+          orderData = await response.json();
+          
+          // Store the order ID in localStorage for payment processing
+          if (orderData.data && orderData.data.orderId) {
+            localStorage.setItem('currentOrderId', orderData.data.orderId);
+            setOrderId(orderData.data.orderId);
+          }
+        } else {
+          // For regular cart checkout - call the orders API endpoint
+          // Format cart items for the API
+          const formattedCartItems = items.map(item => ({
+            productId: item.productId,
+            weight: {
+              value: item.weight.value,
+              unit: item.weight.unit
+            },
+            quantity: item.quantity
+          }));
+          
+          // For authenticated users - call the backend API
+          const response = await fetch('https://fusionmokshabackend-production.up.railway.app/api/orders', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              cartItems: formattedCartItems,
+              address: selectedAddressDetails,
+              paymentMethod: paymentMethod.toUpperCase() // Backend expects 'COD' or 'ONLINE'
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to create order');
+          }
+          
+          orderData = await response.json();
+          
+          // Store the order ID in localStorage for payment processing
+          if (orderData.data && orderData.data.orderId) {
+            localStorage.setItem('currentOrderId', orderData.data.orderId);
+            setOrderId(orderData.data.orderId);
+          }
         }
         
         // If payment method is COD, we're done
         if (paymentMethod.toUpperCase() === 'COD') {
           toast.success('Order placed successfully!');
-          // Clear the cart after successful order
-          dispatch(clearCart());
+          // Clear the cart after successful order (only for regular cart checkout)
+          if (!isBuyNow) {
+            dispatch(clearCart());
+          }
           // Move to confirmation step
           setStep(3);
         } else {
@@ -805,37 +857,67 @@ const Checkout = () => {
     );
   };
   
+  // Calculate subtotal for Buy Now product
+  const calculateBuyNowSubtotal = () => {
+    if (!buyNowProduct) return 0;
+    return buyNowProduct.price * buyNowProduct.quantity;
+  };
+  
   // Render cart summary
   const renderCartSummary = () => {
     return (
       <CheckoutSummary>
         <SectionTitle>Order Summary</SectionTitle>
         <CartItemsList>
-          {items.map(item => (
-            <CartItem key={item._id}>
+          {isBuyNow && buyNowProduct ? (
+            // Display Buy Now product
+            <CartItem key={`buy-now-${buyNowProduct.productId}`}>
               <CartItemImage 
-                src={item.image || '/images/default-product.png'} 
-                alt={item.productName || 'Product'}
+                src={buyNowProduct.image || '/images/default-product.png'} 
+                alt={buyNowProduct.name || 'Product'}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = '/images/default-product.png';
                 }}
               />
               <CartItemDetails>
-                <CartItemName>{item.productName || 'Product'}</CartItemName>
+                <CartItemName>{buyNowProduct.name || 'Product'}</CartItemName>
                 <CartItemMeta>
-                  {item.weight.value} {item.weight.unit} × {item.quantity}
+                  {buyNowProduct.weight.value} {buyNowProduct.weight.unit} × {buyNowProduct.quantity}
                 </CartItemMeta>
               </CartItemDetails>
               <CartItemPrice>
-                ₹{(item.price * item.quantity).toFixed(2)}
+                ₹{(buyNowProduct.price * buyNowProduct.quantity).toFixed(2)}
               </CartItemPrice>
             </CartItem>
-          ))}
+          ) : (
+            // Display regular cart items
+            items.map(item => (
+              <CartItem key={item._id}>
+                <CartItemImage 
+                  src={item.image || '/images/default-product.png'} 
+                  alt={item.productName || 'Product'}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/images/default-product.png';
+                  }}
+                />
+                <CartItemDetails>
+                  <CartItemName>{item.productName || 'Product'}</CartItemName>
+                  <CartItemMeta>
+                    {item.weight.value} {item.weight.unit} × {item.quantity}
+                  </CartItemMeta>
+                </CartItemDetails>
+                <CartItemPrice>
+                  ₹{(item.price * item.quantity).toFixed(2)}
+                </CartItemPrice>
+              </CartItem>
+            ))
+          )}
         </CartItemsList>
         <SummaryRow>
           <span>Subtotal</span>
-          <span>₹{calculateSubtotal().toFixed(2)}</span>
+          <span>₹{isBuyNow ? calculateBuyNowSubtotal().toFixed(2) : calculateSubtotal().toFixed(2)}</span>
         </SummaryRow>
         <SummaryRow>
           <span>Shipping</span>
@@ -843,18 +925,18 @@ const Checkout = () => {
         </SummaryRow>
         <SummaryRow className="total">
           <span>Total</span>
-          <span>₹{calculateTotal().toFixed(2)}</span>
+          <span>₹{isBuyNow ? calculateBuyNowSubtotal().toFixed(2) : calculateTotal().toFixed(2)}</span>
         </SummaryRow>
         
         {step === 1 && (
-          <Button onClick={handleContinueToPayment} disabled={loading || items.length === 0}>
+          <Button onClick={handleContinueToPayment} disabled={loading || (isBuyNow ? !buyNowProduct : items.length === 0)}>
             Continue to Payment
           </Button>
         )}
         
         {step === 2 && (
           <>
-            <Button onClick={handlePlaceOrder} disabled={isProcessing || items.length === 0}>
+            <Button onClick={handlePlaceOrder} disabled={isProcessing || (isBuyNow ? !buyNowProduct : items.length === 0)}>
               {isProcessing ? 'Processing...' : 'Place Order'}
             </Button>
             <Button secondary onClick={() => setStep(1)} disabled={isProcessing}>

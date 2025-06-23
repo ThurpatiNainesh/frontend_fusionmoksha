@@ -266,7 +266,7 @@ const ButtonContainer = styled.div`
 
 const AddToCartButton = styled.button`
   padding: 0.75rem 1.5rem;
-  background-color: #8c8c8c;
+  background-color: #2e7d32;
   color: white;
   border: none;
   border-radius: 4px;
@@ -275,7 +275,7 @@ const AddToCartButton = styled.button`
   transition: background-color 0.2s;
   
   &:hover {
-    background-color: #777777;
+    background-color: #1b5e20;
   }
 `;
 
@@ -436,14 +436,76 @@ const ProductDetails = () => {
       console.log('Cart response:', result);
       toast.success(`${quantity} ${product.name} added to cart`);
     } catch (error) {
-      console.error('Add to cart error:', error);
       toast.error(typeof error === 'string' ? error : 'Failed to add item to cart. Please try again.');
     }
   };
 
   const handleBuyNow = () => {
-    toast.info('Proceeding to checkout...');
-    // Add your checkout logic here
+    try {
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.info('Please login to continue with purchase');
+        navigate('/login', { 
+          state: { 
+            from: window.location.pathname,
+            buyNowProduct: {
+              productId: product._id,
+              weight: selectedVariant.weight,
+              quantity: quantity,
+              variant: selectedVariant
+            }
+          } 
+        });
+        return;
+      }
+
+      // Check if variant is selected
+      if (!selectedVariant) {
+        toast.error('Please select a product variant');
+        return;
+      }
+      
+      // Create weight object
+      let weightObj;
+      if (typeof selectedVariant.weight === 'object') {
+        // If weight is already an object with value and unit
+        weightObj = selectedVariant.weight;
+      } else {
+        // If weight is a number or string
+        weightObj = {
+          value: parseFloat(selectedVariant.weight) || 100,
+          unit: selectedVariant.unit || 'g'
+        };
+      }
+      
+      // Prepare product data for checkout
+      const buyNowProduct = {
+        productId: product._id,
+        weight: weightObj,
+        quantity: quantity,
+        price: selectedVariant.price,
+        originalPrice: selectedVariant.originalPrice,
+        discountPrice: selectedVariant.discountPrice,
+        savings: selectedVariant.savings,
+        savingsPercentage: selectedVariant.savingsPercentage,
+        image: selectedVariant.image || product.mainImage,
+        name: product.name
+      };
+      
+      toast.info('Proceeding to checkout...');
+      
+      // Navigate to checkout with the product data
+      navigate('/checkout', { 
+        state: { 
+          buyNowProduct,
+          isBuyNow: true
+        } 
+      });
+    } catch (error) {
+      console.error('Buy now error:', error);
+      toast.error('Failed to process your request. Please try again.');
+    }
   };
 
   // Image zoom functionality
@@ -625,9 +687,6 @@ const ProductDetails = () => {
                 </QuantityControls>
 
                 <ButtonContainer>
-                  <BuyNowButton onClick={handleBuyNow}>
-                    {t('buyNow', 'Buy Now')}
-                  </BuyNowButton>
                   <AddToCartButton onClick={handleAddToCart}>
                     {t('addToCart', 'Add to Cart')}
                   </AddToCartButton>

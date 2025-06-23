@@ -155,12 +155,9 @@ const AddToCartButton = ({ product, weight, variant, quantity = 1, className, st
         if (cartJSON) {
           const cart = JSON.parse(cartJSON);
           
+          // In the transformed format, productId is already extracted as a string
           const localCartItem = cart.find(item => {
-            const itemProductId = isAuthenticated ? 
-              (typeof item.productId === 'object' ? item.productId._id : item.productId) : 
-              item.productId;
-            
-            const match = itemProductId === product._id && 
+            const match = item.productId === product._id && 
                    item.weight?.value === selectedWeight.value && 
                    item.weight?.unit === selectedWeight.unit;
                    
@@ -202,27 +199,39 @@ const AddToCartButton = ({ product, weight, variant, quantity = 1, className, st
             
             console.log('Backend returned items:', data.items);
             
-            // Update localStorage with backend data
-            if (isAuthenticated) {
-              localStorage.setItem('fusionmoksha_auth_cart', JSON.stringify(data.items));
-            } else {
-              localStorage.setItem('fusionmoksha_guest_cart', JSON.stringify(data.items));
-            }
-            
-            // Find the matching cart item
-            const cartItem = data.items.find(item => {
-              // Check if the product ID and weight match
-              const itemProductId = typeof item.productId === 'object' ? item.productId._id : item.productId;
-              return itemProductId === product._id && 
-                     item.weight.value === selectedWeight.value && 
-                     item.weight.unit === selectedWeight.unit;
-            });
-            
-            // Update UI if the backend quantity is different from localStorage
-            if (cartItem && cartItem.quantity !== initialQuantity) {
-              console.log('Backend quantity differs from localStorage, updating UI:', cartItem.quantity);
-              setCartQuantity(cartItem.quantity);
-              setIsAdded(cartItem.quantity > 0);
+            // Transform and update localStorage with backend data
+            if (Array.isArray(data)) {
+              // Transform API data into our simplified format
+              const transformedCart = data.map(item => {
+                const productId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+                return {
+                  productId,
+                  weight: item.weight,
+                  quantity: item.quantity,
+                  price: item.price,
+                  image: item.image || (item.productId?.mainImage || ''),
+                  name: item.productId?.name || '',
+                  _id: item._id
+                };
+              });
+              
+              // Store transformed data in localStorage
+              const cartKey = isAuthenticated ? 'fusionmoksha_auth_cart' : 'fusionmoksha_guest_cart';
+              localStorage.setItem(cartKey, JSON.stringify(transformedCart));
+              
+              // Find the matching cart item in transformed data
+              const cartItem = transformedCart.find(item => 
+                item.productId === product._id && 
+                item.weight.value === selectedWeight.value && 
+                item.weight.unit === selectedWeight.unit
+              );
+              
+              // Update UI if the backend quantity is different from localStorage
+              if (cartItem && cartItem.quantity !== initialQuantity) {
+                console.log('Backend quantity differs from localStorage, updating UI:', cartItem.quantity);
+                setCartQuantity(cartItem.quantity);
+                setIsAdded(cartItem.quantity > 0);
+              }
             }
           })
           .catch(fetchError => {
@@ -486,8 +495,7 @@ const AddToCartButton = ({ product, weight, variant, quantity = 1, className, st
       setCartQuantity(newQuantity);
       setIsAdded(true);
       
-      // Update localStorage immediately for fast UI feedback
-      updateLocalStorage(product._id, selectedWeight, newQuantity);
+      // We'll let the thunk handle localStorage updates
       
       // Use the updateCartQuantity API endpoint to increment cart item
       // This happens in the background - we don't wait for the response to update UI
@@ -566,8 +574,7 @@ const AddToCartButton = ({ product, weight, variant, quantity = 1, className, st
       setCartQuantity(newQuantity);
       setIsAdded(newQuantity > 0);
       
-      // Update localStorage immediately for fast UI feedback
-      updateLocalStorage(product._id, selectedWeight, newQuantity);
+      // We'll let the thunk handle localStorage updates
       
       // Use the updateCartQuantity API endpoint to decrement cart item
       // This happens in the background - we don't wait for the response to update UI

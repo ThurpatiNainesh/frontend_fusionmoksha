@@ -76,25 +76,45 @@ const ProductCardShop = ({ product, className }) => {
   const defaultVariant = product.variants?.[0] || {};
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
   
-  // Get cart items from Redux store for synchronization purposes
+  // Check if user is authenticated
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  
+  // Get cart items from Redux store as fallback
   const cartItems = useSelector(state => state.cart.items);
   
-  // Find the current cart quantity for this product
+  // Find the current cart quantity for this product from localStorage
   const currentCartQuantity = useMemo(() => {
-    // First check if there's a matching item in the cart
+    try {
+      // Determine which localStorage key to use based on authentication status
+      const cartKey = isAuthenticated ? 'fusionmoksha_auth_cart' : 'fusionmoksha_guest_cart';
+      const cartJSON = localStorage.getItem(cartKey);
+      
+      if (cartJSON) {
+        const cart = JSON.parse(cartJSON);
+        const selectedWeight = selectedVariant.weight;
+        
+        // Find the item in localStorage using the transformed cart data format
+        // In the transformed format, productId is already extracted as a string
+        const localCartItem = cart.find(item => 
+          item.productId === product._id && 
+          item.weight?.value === selectedWeight.value && 
+          item.weight?.unit === selectedWeight.unit
+        );
+        
+        // Return the quantity from localStorage if found, otherwise 0
+        return localCartItem ? localCartItem.quantity : 0;
+      }
+    } catch (error) {
+      console.error('Error reading cart from localStorage:', error);
+    }
+    
+    // Fallback to Redux store or product.cartQuantity if localStorage fails
     const cartItem = cartItems.find(item => {
       const itemProductId = item.product?._id || item.product || item.productId;
       return itemProductId === product._id;
     });
-    
-    // If found in cart, use that quantity
-    if (cartItem) {
-      return cartItem.quantity;
-    }
-    
-    // Otherwise use the product's cartQuantity if available
-    return product.cartQuantity || 0;
-  }, [cartItems, product._id, product.cartQuantity]);
+    return cartItem ? cartItem.quantity : (product.cartQuantity || 0);
+  }, [cartItems, product._id, product.cartQuantity, selectedVariant.weight, isAuthenticated]);
   
   // Create a product data object with the latest cart quantity
   const productData = useMemo(() => ({

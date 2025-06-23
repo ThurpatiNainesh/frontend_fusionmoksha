@@ -46,6 +46,54 @@ const saveAuthUserCart = (cartItems) => {
   }
 };
 
+// Helper function to transform API cart data into a hashed format for efficient lookup
+const transformCartDataForStorage = (cartItems) => {
+  if (!Array.isArray(cartItems)) return [];
+  
+  return cartItems.map(item => {
+    // Extract the product ID from the productId object or use directly if it's a string
+    const productId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+    
+    return {
+      productId: productId,
+      weight: item.weight,
+      quantity: item.quantity,
+      // Keep additional data that might be needed for display
+      price: item.price,
+      image: item.image || (item.productId?.mainImage || ''),
+      name: item.productId?.name || '',
+      _id: item._id
+    };
+  });
+};
+
+// Helper function to initialize cart from backend API response
+export const initializeCartFromBackend = createAsyncThunk(
+  'cart/initializeCartFromBackend',
+  async (_, { rejectWithValue }) => {
+    try {
+      // Set up authentication if user is logged in
+      setupAxiosAuth();
+      
+      // Fetch cart data from backend
+      const response = await axios.get(API_URL);
+      const cartItems = response.data;
+      
+      // Transform and save to localStorage for efficient lookup
+      if (Array.isArray(cartItems)) {
+        const transformedCart = transformCartDataForStorage(cartItems);
+        localStorage.setItem(AUTH_USER_CART_KEY, JSON.stringify(transformedCart));
+        console.log('Cart initialized from backend, transformed and saved to localStorage');
+      }
+      
+      return cartItems; // Return original data for Redux store
+    } catch (error) {
+      console.error('Error initializing cart from backend:', error);
+      return rejectWithValue(handleApiError(error));
+    }
+  }
+);
+
 // Helper function to get authenticated user's cart from localStorage
 const getAuthUserCart = () => {
   try {
@@ -71,7 +119,20 @@ export const fetchCartItems = createAsyncThunk(
       // For both authenticated and guest users, fetch from API
       // The backend API handles both cases with the optionalAuth middleware
       const response = await axios.get('https://fusionmokshabackend-production.up.railway.app/api/cart');
-      return response.data;
+      const cartItems = response.data;
+      
+      // Transform and store cart data in localStorage for real-time access
+      if (Array.isArray(cartItems)) {
+        const transformedCart = transformCartDataForStorage(cartItems);
+        if (isAuthenticated) {
+          localStorage.setItem(AUTH_USER_CART_KEY, JSON.stringify(transformedCart));
+        } else {
+          localStorage.setItem(GUEST_CART_KEY, JSON.stringify(transformedCart));
+        }
+        console.log('Cart data fetched, transformed and stored in localStorage');
+      }
+      
+      return cartItems;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -138,6 +199,57 @@ export const updateCartQuantityApi = createAsyncThunk(
   'cart/updateCartQuantityApi',
   async ({ productId, weight, action, quantity }, { getState, rejectWithValue, dispatch }) => {
     try {
+      const { auth } = getState();
+      const isAuthenticated = auth.isAuthenticated;
+      const cartKey = isAuthenticated ? AUTH_USER_CART_KEY : GUEST_CART_KEY;
+      
+      // First, update localStorage for immediate UI feedback
+      try {
+        const cartJSON = localStorage.getItem(cartKey);
+        if (cartJSON) {
+          let cart = JSON.parse(cartJSON);
+          
+          // Find the item in the cart
+          const itemIndex = cart.findIndex(item => {
+            return item.productId === productId && 
+                   item.weight?.value === weight.value && 
+                   item.weight?.unit === weight.unit;
+          });
+          
+          let newQuantity;
+          if (itemIndex !== -1) {
+            // Item exists, update quantity
+            if (action === 'set') {
+              newQuantity = quantity;
+            } else if (action === 'increment') {
+              newQuantity = cart[itemIndex].quantity + (quantity || 1);
+            } else if (action === 'decrement') {
+              newQuantity = Math.max(0, cart[itemIndex].quantity - (quantity || 1));
+            }
+            
+            if (newQuantity > 0) {
+              cart[itemIndex].quantity = newQuantity;
+            } else {
+              // Remove item if quantity is 0
+              cart = cart.filter((_, index) => index !== itemIndex);
+            }
+          } else if (action !== 'decrement') {
+            // Item doesn't exist and we're not trying to decrement
+            // Add new item
+            cart.push({
+              productId,
+              weight,
+              quantity: quantity || 1
+            });
+          }
+          
+          // Save updated cart to localStorage
+          localStorage.setItem(cartKey, JSON.stringify(cart));
+        }
+      } catch (localStorageError) {
+        console.error('Error updating localStorage cart:', localStorageError);
+      }
+      
       // Set up authentication if user is logged in
       setupAxiosAuth();
       
@@ -150,10 +262,19 @@ export const updateCartQuantityApi = createAsyncThunk(
         quantity // Pass the exact quantity if provided
       });
       
-      // After successful update, immediately fetch the latest cart data
-      // This ensures the Redux store has the most up-to-date information
+      // After successful update, get the latest cart data from API
       try {
-        await dispatch(fetchCartItems()).unwrap();
+        const cartResponse = await axios.get('https://fusionmokshabackend-production.up.railway.app/api/cart');
+        const cartItems = cartResponse.data;
+        
+        // Transform and update localStorage with fresh data from API
+        if (Array.isArray(cartItems)) {
+          const transformedCart = transformCartDataForStorage(cartItems);
+          localStorage.setItem(cartKey, JSON.stringify(transformedCart));
+        }
+        
+        // Update Redux store
+        dispatch({ type: 'cart/fetchCartItems/fulfilled', payload: cartItems });
       } catch (fetchError) {
         console.error('Error fetching cart after update:', fetchError);
       }
@@ -164,7 +285,6 @@ export const updateCartQuantityApi = createAsyncThunk(
         weight,
         action,
         quantity // Include the exact quantity in the response
-        // Not using backend cartQuantity as requested
       };
     } catch (error) {
       return rejectWithValue({
@@ -509,6 +629,28 @@ const cartSlice = createSlice({
       }
     });
     builder.addCase(updateCartQuantityApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    
+    // Initialize cart from backend
+    builder.addCase(initializeCartFromBackend.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(initializeCartFromBackend.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = null;
+      
+      // Update Redux state with cart items from backend
+      if (Array.isArray(action.payload)) {
+        state.items = action.payload;
+      }
+      
+      // Set as authenticated user
+      state.isGuest = false;
+    });
+    builder.addCase(initializeCartFromBackend.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
