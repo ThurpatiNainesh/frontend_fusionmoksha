@@ -42,6 +42,20 @@ const ProductGrid = styled.div`
   gap: 2rem;
   padding-top: 2rem;
   overflow: visible;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+  
+  @media (max-width: 576px) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+  }
 `;
 
 
@@ -62,6 +76,14 @@ const Shop = () => {
   }));
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  // Track window width for responsive design
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch products when the page loads or when currentPage changes
   useEffect(() => {
@@ -141,54 +163,19 @@ const Shop = () => {
 
   return (
     <>
-      <div style={{
-        marginTop: '0.2rem',
-        width: '100vw',
-        position: 'relative',
-        left: '50%',
-        right: '50%',
-        marginLeft: '-50vw',
-        marginRight: '-50vw',
-        height: '360px',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <img 
-          src="/images/shop/shop_02.jpg" 
-          alt="Hero Image" 
-          style={{
-            width: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-            position: 'absolute',
-            zIndex: 1
-          }} 
-        />
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          zIndex: 2
-        }}></div>
-        <h1 style={{
-          color: '#fff',
-          fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-          margin: 0,
-          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-          zIndex: 3,
-          textAlign: 'center'
-        }}>{t('headingShop')}</h1>
-      </div>
+
+      <HeroBanner style={{ backgroundImage: 'url(/images/shop/shop_02.jpg)' }}>
+        <h1>{t('headingShop')}</h1>
+      </HeroBanner>
       <ProductGrid>
         {products && products.length > 0 ? (
           products.map((product) => (
-            <ProductCard key={product._id} product={product} />
+            <div key={product._id} style={{
+              width: windowWidth <= 576 ? '48%' : 'auto',
+              marginBottom: windowWidth <= 576 ? '1rem' : '0',
+            }}>
+              <ProductCard product={product} />
+            </div>
           ))
         ) : (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>

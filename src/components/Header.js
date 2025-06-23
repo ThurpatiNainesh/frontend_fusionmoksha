@@ -38,7 +38,12 @@ const IconContainer = styled.div`
   }
   
   @media (max-width: 768px) {
-    margin-left: 1rem;
+    margin-left: auto;
+    margin-right: 0.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    gap: 0.8rem;
   }
 `;
 
@@ -431,7 +436,11 @@ const HeaderWrapper = styled.header`
   padding: 0.8rem 0;
   
   @media (max-width: 768px) {
-    padding: 0.8rem 0;
+    padding: 0.5rem 0;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 0.3rem 0;
   }
 `;
 
@@ -458,8 +467,12 @@ const Flex = styled.div`
   width: 100%;
   
   @media (max-width: 768px) {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: space-between;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 0.3rem 0;
   }
 `;
 
@@ -496,34 +509,43 @@ const MainNav = styled.nav`
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 250px; /* Smaller side nav */
     height: 100vh;
     background: white;
     z-index: 105;
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 5rem;
+    padding-top: 4rem;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     margin: 0;
-    gap: 1.5rem;
+    gap: 1rem;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     
     &.mobile-open {
       transform: translateX(0);
     }
     
     a {
-      font-size: 1.2rem;
-      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      padding: 0.7rem 1.5rem;
       width: 100%;
-      text-align: center;
+      text-align: left;
+      border-left: 3px solid transparent;
+      
+      &.active, &:hover {
+        border-left: 3px solid #faad14;
+        background-color: rgba(250, 173, 20, 0.05);
+      }
     }
   }
   
   @media (max-width: 576px) {
+    width: 220px; /* Even smaller on phones */
+    
     a {
-      font-size: 1.1rem;
-      padding: 0.7rem 1.5rem;
+      font-size: 0.95rem;
+      padding: 0.6rem 1.2rem;
     }
   }
   
@@ -556,8 +578,12 @@ const LeftSection = styled.div`
   
   @media (max-width: 768px) {
     margin-right: 0;
-    justify-content: center;
-    width: 100%;
+    justify-content: flex-start;
+    width: auto;
+  }
+  
+  @media (max-width: 576px) {
+    flex: 0;
   }
 `;
 
@@ -603,7 +629,7 @@ const MobileMenuToggle = styled.button`
   cursor: pointer;
   color: #333;
   padding: 0.5rem;
-  margin-left: 1rem;
+  margin-left: 0.5rem;
   
   &:hover {
     color: #faad14;
@@ -612,6 +638,11 @@ const MobileMenuToggle = styled.button`
   @media (max-width: 768px) {
     display: block;
     order: -1;
+  }
+  
+  @media (max-width: 576px) {
+    margin-left: 0;
+    font-size: 1.3rem;
   }
 `;
 
@@ -647,6 +678,10 @@ const LogoContainer = styled.div`
   position: relative;
   z-index: 101;
   padding: 0.5rem 0;
+  
+  @media (max-width: 576px) {
+    display: none; /* Hide logo on phone screens */
+  }
 `;
 
 const Nav = styled.nav`
@@ -885,7 +920,7 @@ const Header = () => {
         <Flex>
           <LeftSection>
             <LogoContainer>
-              <img src="/images/mok1.2_03.png" alt="Fusion Moksha" style={{ height: '120px', width: 'auto' }} />
+              <img src="/images/mok1.2_03.png" alt="Fusion Moksha" style={{ height: '120px', width: 'auto' }} className="header-logo" />
             </LogoContainer>
             <MobileMenuToggle onClick={toggleMobileMenu}>
               <FontAwesomeIcon icon={faBars} />

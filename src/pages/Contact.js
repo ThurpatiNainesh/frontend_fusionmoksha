@@ -247,57 +247,10 @@ const Contact = () => {
   const { t } = useTranslation();
   return (
     <>
-      {/* <HeroBanner style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1546832947-15b015b363e5?w=1200)' }}>
+       <HeroBanner style={{ backgroundImage: 'url(/images/contactuspage/cont0.png)' }}>
         <h1>{t('headingContact')}</h1>
-      </HeroBanner> */}
-      {/* <HeroBanner style={{ backgroundImage: 'url(/images/contactuspage/cont0.png)' }}>
-        <h1>{t('headingContact')}</h1>
-      </HeroBanner> */}
-      <div style={{
-        marginTop: '0.2rem',
-        width: '100vw',
-        position: 'relative',
-        left: '50%',
-        right: '50%',
-        marginLeft: '-50vw',
-        marginRight: '-50vw',
-        height: '360px',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <img 
-          src="/images/contactuspage/cont0.png" 
-          alt="Hero Image" 
-          style={{
-            width: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-            position: 'absolute',
-            zIndex: 1
-          }} 
-        />
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          zIndex: 2
-        }}></div>
-        <h1 style={{
-          color: '#fff',
-          fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-          margin: 0,
-          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-          zIndex: 3,
-          textAlign: 'center'
-        }}>{t('headingContact')}</h1>
-      </div>
-       {/* <img src="/images/contactuspage/cont0.png" alt="Contact Banner" style={{ width: '100%', height: 'auto', display: 'block', marginTop: '-1rem' }} /> */}
+      </HeroBanner>
+      
       <ContentWrapper>
         <ContactGrid>
           <ContactForm>

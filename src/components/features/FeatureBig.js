@@ -5,13 +5,16 @@ const FeatureBig = ({ image, title, description, buttonText }) => {
   return (
     <div style={{
       flex: '1',
-      maxWidth: '600px',
-      height: '100%'
+      maxWidth: '100%',
+      height: 'auto'
     }}>
       <div style={{
-        height: 'calc(100% - 100px)',
+        height: 'auto',
+        minHeight: '250px',
+        maxHeight: '400px',
         marginBottom: '1rem',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        borderRadius: '4px'
       }}>
         <img 
           src={image} 
@@ -24,17 +27,20 @@ const FeatureBig = ({ image, title, description, buttonText }) => {
           }} 
         />
       </div>
-      <div style={{ paddingTop: '1rem' }}>
+      <div style={{ padding: '0.5rem 0.5rem 1rem' }}>
         <h3 style={{
           color: '#333',
-          marginBottom: '0.5rem'
+          marginBottom: '0.75rem',
+          fontSize: 'clamp(1.2rem, 4vw, 1.5rem)',
+          fontWeight: '600'
         }}>{title}</h3>
         <p style={{
           color: '#666',
           lineHeight: '1.6',
-          marginBottom: '0.5rem'
+          marginBottom: '0.75rem',
+          fontSize: 'clamp(0.9rem, 2.5vw, 1rem)'
         }}>{description}</p>
-        <div style={{ marginTop: '0.5rem' }}>
+        <div style={{ marginTop: '0.75rem' }}>
           <ReadMoreButton>{buttonText}</ReadMoreButton>
         </div>
       </div>
