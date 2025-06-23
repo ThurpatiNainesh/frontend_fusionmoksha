@@ -51,9 +51,9 @@ const ProductGrid = styled.div`
   
   @media (max-width: 576px) {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
     padding: 1.5rem 1rem;
   }
 `;
@@ -171,8 +171,8 @@ const Shop = () => {
         {products && products.length > 0 ? (
           products.map((product) => (
             <div key={product._id} style={{
-              width: windowWidth <= 576 ? '48%' : 'auto',
-              marginBottom: windowWidth <= 576 ? '1rem' : '0',
+              width: windowWidth <= 576 ? '100%' : 'auto',
+              marginBottom: windowWidth <= 576 ? '0.5rem' : '0',
             }}>
               <ProductCard product={product} />
             </div>
