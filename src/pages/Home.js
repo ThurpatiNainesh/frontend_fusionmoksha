@@ -68,7 +68,7 @@ const CategoryImage = styled.img`
 
 const HorizontalImage = styled.div`
   width: calc(25% - 0.5rem);
-  height: 450px;
+  height: 500px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -95,13 +95,13 @@ const HorizontalImage = styled.div`
   
   @media (max-width: 992px) {
     width: calc(50% - 0.5rem);
-    height: 350px;
+    height: 400px;
   }
   
   @media (max-width: 576px) {
     min-width: calc(50% - 0.5rem);
     flex: 0 0 calc(50% - 0.5rem);
-    height: 250px;
+    height: 300px;
     scroll-snap-align: start;
   }
 `;
@@ -247,8 +247,9 @@ const Home = () => {
                 alt="Hero Image" 
                 style={{
                   width: '100%',
-                  height: 'auto',
-                  display: 'block'
+                  height: windowWidth <= 576 ? '32vh' : 'auto',
+                  display: 'block',
+                  objectFit: windowWidth <= 576 ? 'cover' : 'initial'
                 }} 
               />
             </picture>
@@ -381,8 +382,9 @@ const Home = () => {
           src="/images/homePage/home_64.png" alt="Home Section 4"
           style={{
             width: '100%',
-            height: 'auto',
-            display: 'block'
+            height: windowWidth <= 576 ? '40vh' : 'auto',
+            display: 'block',
+            objectFit: windowWidth <= 576 ? 'cover' : 'initial'
           }}
         />
       </div>
@@ -509,8 +511,9 @@ const Home = () => {
               alt="Home Section 6"
               style={{
                 width: '100%',
-                height: 'auto',
-                display: 'block'
+                height: windowWidth <= 576 ? '35vh' : 'auto',
+                display: 'block',
+                objectFit: windowWidth <= 576 ? 'cover' : 'initial'
               }}
             />
           </div>
