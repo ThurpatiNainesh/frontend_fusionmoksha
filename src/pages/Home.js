@@ -247,7 +247,7 @@ const Home = () => {
                 alt="Hero Image" 
                 style={{
                   width: '100%',
-                  height: windowWidth <= 576 ? '32vh' : 'auto',
+                  height: windowWidth <= 576 ? '28vh' : 'auto',
                   display: 'block',
                   objectFit: windowWidth <= 576 ? 'cover' : 'initial'
                 }} 
@@ -511,7 +511,7 @@ const Home = () => {
               alt="Home Section 6"
               style={{
                 width: '100%',
-                height: windowWidth <= 576 ? '35vh' : 'auto',
+                height: windowWidth <= 576 ? '30vh' : 'auto',
                 display: 'block',
                 objectFit: windowWidth <= 576 ? 'cover' : 'initial'
               }}
