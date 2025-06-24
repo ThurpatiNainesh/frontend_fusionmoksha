@@ -14,11 +14,18 @@ const HeroBanner = styled.section`
   justify-content: center;
   margin: 0;
   padding: 0;
+  
+  @media (max-width: 576px) {
+    min-height: 220px;
+  }
+  
   h1 {
     color: #fff;
     font-size: clamp(1.75rem, 4vw, 3rem);
     text-align: center;
     margin: 0;
+    padding: 0 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   }
 `;
 
@@ -26,6 +33,14 @@ const ContentWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 1rem;
+  }
 `;
 
 const FeaturesGrid = styled.div`
@@ -33,6 +48,12 @@ const FeaturesGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   margin-top: 3rem;
+  
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
 `;
 
 const FeatureCard = styled.div`
@@ -41,12 +62,21 @@ const FeatureCard = styled.div`
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  @media (max-width: 576px) {
+    padding: 1.5rem;
+  }
 `;
 
 const FeatureIcon = styled.span`
   font-size: 2.5rem;
   color: #faad14;
   margin-bottom: 1rem;
+  
+  @media (max-width: 576px) {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
 `;
 
 const TwoColumnLayout = styled.div`
@@ -63,6 +93,14 @@ const TwoColumnLayout = styled.div`
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
     gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 1rem;
+    gap: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
   }
 `;
 
@@ -72,6 +110,14 @@ const ImageContainer = styled.div`
   gap: 1.5rem;
   align-items: flex-end;
   
+  @media (max-width: 768px) {
+    order: -1; /* Move images above content on mobile */
+  }
+  
+  @media (max-width: 576px) {
+    gap: 1rem;
+  }
+  
   img {
     width: 100%;
     height: auto;
@@ -79,8 +125,17 @@ const ImageContainer = styled.div`
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
     
+    @media (max-width: 576px) {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
     &:hover {
       transform: scale(1.02);
+      
+      @media (max-width: 576px) {
+        transform: scale(1.01); /* Smaller scale effect on mobile */
+      }
     }
   }
 `;
@@ -88,12 +143,25 @@ const ImageContainer = styled.div`
 const ContentSection = styled.div`
   padding: 2.5rem;
   
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 1rem 0.5rem;
+  }
+  
   h3 {
     color: black;
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
     text-transform: uppercase;
+    
+    @media (max-width: 576px) {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
   }
   
   p {
@@ -103,6 +171,13 @@ const ContentSection = styled.div`
     font-weight: 300;
     margin-bottom: 1.5rem;
     letter-spacing: 0.5px;
+    
+    @media (max-width: 576px) {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      letter-spacing: 0.3px;
+    }
   }
 `;
 

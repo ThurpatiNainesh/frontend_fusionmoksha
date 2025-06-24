@@ -40,7 +40,11 @@ const BackButton = styled.button`
 const ContentWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
+  
+  @media (max-width: 576px) {
+    padding: 1rem 0.5rem;
+  }
 `;
 
 const ProductContainer = styled.div`
@@ -48,7 +52,11 @@ const ProductContainer = styled.div`
   justify-content: center;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
+  
+  @media (max-width: 576px) {
+    padding: 1rem 0.5rem;
+  }
 `;
 
 const ProductBox = styled.div`
@@ -63,6 +71,14 @@ const ProductBox = styled.div`
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 1rem;
+    gap: 1rem;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -70,6 +86,10 @@ const ImageContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  
+  @media (max-width: 576px) {
+    gap: 0.5rem;
+  }
 `;
 
 const ZoomableImageContainer = styled.div`
@@ -78,6 +98,10 @@ const ZoomableImageContainer = styled.div`
   overflow: hidden;
   border-radius: 8px;
   cursor: zoom-in;
+  
+  @media (max-width: 576px) {
+    border-radius: 4px;
+  }
 `;
 
 const MainImage = styled.img`
@@ -93,6 +117,17 @@ const ThumbnailContainer = styled.div`
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
+  padding-bottom: 0.5rem;
+  
+  @media (max-width: 576px) {
+    gap: 0.25rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+    
+    &::-webkit-scrollbar {
+      height: 3px;
+    }
+  }
 `;
 
 const Thumbnail = styled.img`
@@ -106,18 +141,31 @@ const Thumbnail = styled.img`
   &:hover {
     border-color: #8c8c8c;
   }
+  
+  @media (max-width: 576px) {
+    width: 60px;
+    height: 60px;
+  }
 `;
 
 const ProductInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  
+  @media (max-width: 576px) {
+    gap: 0.75rem;
+  }
 `;
 
 const ProductTitle = styled.h3`
   font-size: 1.75rem;
   margin: 0;
   color: #333;
+  
+  @media (max-width: 576px) {
+    font-size: 1.4rem;
+  }
 `;
 
 const RatingContainer = styled.div`
@@ -125,6 +173,11 @@ const RatingContainer = styled.div`
   align-items: center;
   gap: 0.75rem;
   margin: 0.5rem 0;
+  
+  @media (max-width: 576px) {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
 `;
 
 const StarContainer = styled.div`
@@ -149,6 +202,10 @@ const RatingNumber = styled.span`
   font-weight: 600;
   font-size: 1.1rem;
   color: #333;
+  
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
 `;
 
 const ReviewCount = styled.span`
@@ -156,6 +213,10 @@ const ReviewCount = styled.span`
   font-size: 0.9rem;
   display: flex;
   align-items: center;
+  
+  @media (max-width: 576px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const PriceContainer = styled.div`
@@ -163,29 +224,50 @@ const PriceContainer = styled.div`
   align-items: center;
   gap: 1rem;
   margin: 0.5rem 0;
+  flex-wrap: wrap;
 `;
 
 const Price = styled.span`
   font-size: 1.5rem;
   font-weight: 600;
   color: #333;
+  
+  @media (max-width: 576px) {
+    font-size: 1.3rem;
+  }
 `;
 
 const OriginalPrice = styled.span`
   font-size: 1.1rem;
   text-decoration: line-through;
   color: #999;
+  
+  @media (max-width: 576px) {
+    font-size: 1rem;
+  }
 `;
 
 const Savings = styled.span`
   font-size: 0.9rem;
   color: #4caf50;
+  
+  @media (max-width: 576px) {
+    font-size: 0.85rem;
+    width: 100%;
+    margin-top: 0.25rem;
+  }
 `;
 
 const Description = styled.p`
   color: #666;
   line-height: 1.6;
   margin: 1rem 0;
+  
+  @media (max-width: 576px) {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
 `;
 
 const VariantSelect = styled.select`
@@ -208,6 +290,13 @@ const VariantSelect = styled.select`
     outline: none;
     border-color: #555;
   }
+  
+  @media (max-width: 576px) {
+    padding: 0.6rem 0.8rem;
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
 `;
 
 const QuantityContainer = styled.div`
@@ -216,11 +305,22 @@ const QuantityContainer = styled.div`
   gap: 1rem;
   margin: 1rem 0;
   flex-wrap: wrap;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+  }
 `;
 
 const QuantityLabel = styled.span`
   font-weight: 500;
   color: #333;
+  
+  @media (max-width: 576px) {
+    font-size: 0.95rem;
+  }
 `;
 
 const QuantityControls = styled.div`
@@ -229,6 +329,11 @@ const QuantityControls = styled.div`
   border: 1px solid #8c8c8c;
   border-radius: 4px;
   overflow: hidden;
+  
+  @media (max-width: 576px) {
+    width: 100%;
+    max-width: 180px;
+  }
 `;
 
 const QuantityButton = styled.button`
@@ -245,12 +350,20 @@ const QuantityButton = styled.button`
   &:hover {
     background: #e0e0e0;
   }
+  
+  @media (max-width: 576px) {
+    width: 40px;
+  }
 `;
 
 const QuantityValue = styled.span`
   padding: 0 1rem;
   min-width: 40px;
   text-align: center;
+  
+  @media (max-width: 576px) {
+    flex: 1;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -259,8 +372,9 @@ const ButtonContainer = styled.div`
   margin-left: 1rem;
   
   @media (max-width: 576px) {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     margin-left: 0;
+    width: 100%;
   }
 `;
 
@@ -277,6 +391,12 @@ const AddToCartButton = styled.button`
   &:hover {
     background-color: #1b5e20;
   }
+  
+  @media (max-width: 576px) {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
 `;
 
 const BuyNowButton = styled.button`
@@ -292,6 +412,12 @@ const BuyNowButton = styled.button`
   &:hover {
     background-color: #e0a000;
   }
+  
+  @media (max-width: 576px) {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
 `;
 
 // Tab components
@@ -299,11 +425,26 @@ const TabsContainer = styled.div`
   width: 100%;
   margin-top: 3rem;
   margin-bottom: 2rem;
+  
+  @media (max-width: 576px) {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+  }
 `;
 
 const TabsHeader = styled.div`
   display: flex;
   border-bottom: 1px solid #e8e8e8;
+  
+  @media (max-width: 576px) {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      height: 3px;
+    }
+  }
 `;
 
 const Tab = styled.div`
@@ -318,15 +459,25 @@ const Tab = styled.div`
   &:hover {
     color: #faad14;
   }
+  
+  @media (max-width: 576px) {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
 `;
 
 const TabContent = styled.div`
   padding: 2rem 0;
   line-height: 1.6;
   color: #333;
+  
+  @media (max-width: 576px) {
+    padding: 1.5rem 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
 `;
-
-
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -545,7 +696,7 @@ const ProductDetails = () => {
         right: '50%',
         marginLeft: '-50vw',
         marginRight: '-50vw',
-        height: '360px',
+        height: window.innerWidth <= 576 ? '220px' : '360px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
@@ -584,10 +735,10 @@ const ProductDetails = () => {
 
       <ContentWrapper>
         <h2 style={{
-          fontSize: '2rem',
+          fontSize: window.innerWidth <= 576 ? '1.5rem' : '2rem',
           color: '#333',
           textAlign: 'center',
-          margin: '2rem 0',
+          margin: window.innerWidth <= 576 ? '1.5rem 0' : '2rem 0',
           fontWeight: '500'
         }}>Your favorites all in one place</h2>
 
