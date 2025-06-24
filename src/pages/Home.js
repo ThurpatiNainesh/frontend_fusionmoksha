@@ -507,7 +507,7 @@ const Home = () => {
             marginRight: '-50vw'
           }}>
             <img
-              src="/images/homePage/home_74.png" 
+              src="https://twobrothersindiashop.com/cdn/shop/files/Cow_Image_with_text11_1500x.jpg" 
               alt="Home Section 6"
               style={{
                 width: '100%',
