@@ -1,6 +1,6 @@
 export const featuredData = {
   mainFeature: {
-    image: "/images/homePage/home_80.png",
+    image: "/images/homePage/Buy_Rose_Thandai_Mix.webp",
     title: "Honey Spread with Roasted Almonds",
     description: "Indulge in the perfect blend of pure, golden honey and crunchy roasted almonds. This natural, protein-rich spread is a delicious way to enjoy a nutritious boost any time of day.",
     buttonText: "Read More"
