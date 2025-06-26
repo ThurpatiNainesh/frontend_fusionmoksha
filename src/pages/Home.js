@@ -233,23 +233,24 @@ const Home = () => {
             left: '50%',
             right: '50%',
             marginLeft: '-50vw',
-            marginRight: '-50vw'
+            marginRight: '-50vw',
+            overflow: 'hidden'
           }}>
             <picture>
               {/* Mobile-optimized image */}
               <source 
                 media="(max-width: 576px)" 
-                srcSet="/images/homePage/home_11.png"
+                srcSet="/images/homePage/home_11.jpg"
               />
               {/* Default image */}
               <img 
-                src="/images/homePage/home_11.png" 
+                src="/images/homePage/home_11.jpg" 
                 alt="Hero Image" 
                 style={{
                   width: '100%',
-                  height: windowWidth <= 576 ? '28vh' : 'auto',
+                  height: windowWidth <= 576 ? 'auto' : 'auto',
                   display: 'block',
-                  objectFit: windowWidth <= 576 ? 'cover' : 'initial'
+                  objectFit: windowWidth <= 576 ? 'contain' : 'cover'
                 }} 
               />
             </picture>
@@ -263,6 +264,7 @@ const Home = () => {
             right: '50%',
             marginLeft: '-50vw',
             marginRight: '-50vw',
+            overflow: 'hidden',
             marginTop: windowWidth <= 576 ? '0' : '-2rem'
           }}>
             <picture>
@@ -278,7 +280,8 @@ const Home = () => {
                 style={{
                   width: '100%',
                   height: 'auto',
-                  display: 'block'
+                  display: 'block',
+                  objectFit: windowWidth <= 576 ? 'contain' : 'cover'
                 }}
               />
             </picture>
@@ -370,23 +373,190 @@ const Home = () => {
         </div>
       </div>
       <div style={{
-        marginTop: '0.2rem',
-        width: '100vw',
-        position: 'relative',
-        left: '50%',
-        right: '50%',
-        marginLeft: '-50vw',
-        marginRight: '-50vw'
+        marginTop: '1.5rem',
+        marginBottom: '1.5rem',
+        paddingLeft: windowWidth <= 768 ? '1rem' : '3rem',
+        paddingRight: windowWidth <= 768 ? '1rem' : '3rem',
       }}>
-        <img
-          src="/images/homePage/home_64.png" alt="Home Section 4"
-          style={{
-            width: '100%',
-            height: windowWidth <= 576 ? '40vh' : 'auto',
-            display: 'block',
-            objectFit: windowWidth <= 576 ? 'cover' : 'initial'
+        {/* YouTube-style video player container */}
+        <div style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: '1000px',
+          margin: '0 auto',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+        }}>
+          {/* Video title bar */}
+          <div style={{
+            background: '#f9f9f9',
+            padding: windowWidth <= 576 ? '0.7rem 1rem' : '0.8rem 1.2rem',
+            borderTopLeftRadius: '12px',
+            borderTopRightRadius: '12px',
+            borderBottom: '1px solid #e0e0e0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <div style={{
+                width: windowWidth <= 576 ? '20px' : '24px',
+                height: windowWidth <= 576 ? '20px' : '24px',
+                borderRadius: '50%',
+                background: '#2e7d32',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: windowWidth <= 576 ? '0.7rem' : '0.8rem',
+                fontWeight: 'bold'
+              }}>
+                FM
+              </div>
+              <div style={{
+                fontSize: windowWidth <= 576 ? '0.9rem' : '1rem',
+                fontWeight: '500',
+                color: '#333'
+              }}>
+                Fusion Moksha Organic Farming Process
+              </div>
+            </div>
+            <div style={{
+              fontSize: windowWidth <= 576 ? '0.7rem' : '0.8rem',
+              color: '#666'
+            }}>
+              5:24
+            </div>
+          </div>
+          
+          {/* Video content container */}
+          <div style={{
+            position: 'relative',
+            cursor: 'pointer',
+            overflow: 'hidden',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            background: '#000',
+            aspectRatio: '16 / 9' /* Standard YouTube aspect ratio */
           }}
-        />
+          onClick={() => {
+            // Video play functionality would go here
+            alert('Video playback would start here');
+          }}>
+            <img
+              src="/images/homePage/home_64.jpg" alt="Home Section 4"
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'block',
+                objectFit: 'cover',
+                objectPosition: 'center 30%' /* Focus more on the upper part of the image */
+              }}
+            />
+            
+            {/* Play button */}
+            <div 
+              style={{
+                position: 'absolute',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                background: 'rgba(0, 0, 0, 0.6)',
+                borderRadius: '50%',
+                width: windowWidth <= 576 ? '60px' : '80px',
+                height: windowWidth <= 576 ? '60px' : '80px',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease, background 0.2s ease',
+                boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+              }}
+            >
+              <div 
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderTop: windowWidth <= 576 ? '10px solid transparent' : '15px solid transparent',
+                  borderBottom: windowWidth <= 576 ? '10px solid transparent' : '15px solid transparent',
+                  borderLeft: windowWidth <= 576 ? '18px solid white' : '26px solid white',
+                  marginLeft: windowWidth <= 576 ? '5px' : '8px', /* Optical centering adjustment */
+                }}
+              ></div>
+            </div>
+            
+            {/* Video duration overlay */}
+            <div style={{
+              position: 'absolute',
+              bottom: '10px',
+              right: '10px',
+              background: 'rgba(0, 0, 0, 0.7)',
+              color: 'white',
+              padding: '2px 4px',
+              borderRadius: '2px',
+              fontSize: windowWidth <= 576 ? '0.7rem' : '0.75rem'
+            }}>
+              5:24
+            </div>
+          </div>
+          
+          {/* Video controls bar */}
+          <div style={{
+            background: '#f9f9f9',
+            padding: '0.7rem 1rem',
+            borderBottomLeftRadius: '12px',
+            borderBottomRightRadius: '12px',
+            borderTop: '1px solid #e0e0e0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              <div style={{
+                fontSize: windowWidth <= 576 ? '0.8rem' : '0.9rem',
+                color: '#333',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }}>
+                <span>▶</span> Play
+              </div>
+              <div style={{
+                fontSize: windowWidth <= 576 ? '0.8rem' : '0.9rem',
+                color: '#333',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }}>
+                <span>❤</span> Like
+              </div>
+            </div>
+            <div style={{
+              fontSize: windowWidth <= 576 ? '0.8rem' : '0.9rem',
+              color: '#333',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem'
+            }}>
+              <span>↗</span> Share
+            </div>
+          </div>
+        </div>
       </div>
       <div style={{ padding: '2rem 1rem' }}>
         <div style={{
@@ -497,7 +667,7 @@ const Home = () => {
             />
           </div>
           
-          {/* Second image */}
+          {/* Second image - Blog Section */}
           <div style={{
             width: '100vw',
             position: 'relative',
@@ -506,16 +676,149 @@ const Home = () => {
             marginLeft: '-50vw',
             marginRight: '-50vw'
           }}>
-            <img
-              src="https://twobrothersindiashop.com/cdn/shop/files/Cow_Image_with_text11_1500x.jpg" 
-              alt="Home Section 6"
-              style={{
+            <div style={{ position: 'relative' }}>
+              <img
+                src="/images/homePage/home_74.jpg" 
+                alt="Blog Section"
+                style={{
+                  width: '100%',
+                  height: windowWidth <= 576 ? '30vh' : 'auto',
+                  display: 'block',
+                  objectFit: windowWidth <= 576 ? 'cover' : 'initial',
+                  filter: 'brightness(0.85)'
+                }}
+              />
+              
+              {/* Blog overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '100%',
-                height: windowWidth <= 576 ? '30vh' : 'auto',
-                display: 'block',
-                objectFit: windowWidth <= 576 ? 'cover' : 'initial'
-              }}
-            />
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: windowWidth <= 576 ? '1rem' : '2rem',
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%)'
+              }}>
+                <div style={{
+                  maxWidth: '800px',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: windowWidth <= 576 ? '1rem' : '2rem',
+                }}>
+                  <h2 style={{
+                    color: 'white',
+                    fontSize: windowWidth <= 576 ? '1.5rem' : '2.5rem',
+                    marginBottom: windowWidth <= 576 ? '0.5rem' : '1rem',
+                    fontWeight: '600'
+                  }}>
+                    Our Latest Articles
+                  </h2>
+                  <p style={{
+                    color: '#f0f0f0',
+                    fontSize: windowWidth <= 576 ? '0.9rem' : '1.1rem',
+                    marginBottom: windowWidth <= 576 ? '1rem' : '1.5rem',
+                    maxWidth: '600px',
+                    lineHeight: '1.5'
+                  }}>
+                    Explore our collection of articles about organic farming, sustainable practices, 
+                    and the benefits of natural ingredients in your daily life.
+                  </p>
+                  
+                  {/* Blog action buttons */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    flexWrap: 'wrap',
+                    marginTop: windowWidth <= 576 ? '0.5rem' : '1rem'
+                  }}>
+                    <button style={{
+                      background: '#2e7d32',
+                      color: 'white',
+                      border: 'none',
+                      padding: windowWidth <= 576 ? '0.5rem 1rem' : '0.7rem 1.5rem',
+                      borderRadius: '4px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <span style={{ fontSize: windowWidth <= 576 ? '0.9rem' : '1rem' }}>Visit Blog</span>
+                      <div style={{
+                        width: windowWidth <= 576 ? '16px' : '20px',
+                        height: windowWidth <= 576 ? '16px' : '20px',
+                        borderRadius: '50%',
+                        background: 'white',
+                        color: '#2e7d32',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: windowWidth <= 576 ? '0.7rem' : '0.9rem',
+                        fontWeight: 'bold'
+                      }}>
+                        →
+                      </div>
+                    </button>
+                    <button style={{
+                      background: 'transparent',
+                      color: 'white',
+                      border: '1px solid white',
+                      padding: windowWidth <= 576 ? '0.5rem 1rem' : '0.7rem 1.5rem',
+                      borderRadius: '4px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      fontSize: windowWidth <= 576 ? '0.9rem' : '1rem'
+                    }}>
+                      Subscribe
+                    </button>
+                  </div>
+                  
+                  {/* Blog stats */}
+                  <div style={{
+                    display: 'flex',
+                    gap: windowWidth <= 576 ? '1rem' : '2rem',
+                    marginTop: windowWidth <= 576 ? '1rem' : '2rem'
+                  }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem',
+                      color: 'white',
+                      fontSize: windowWidth <= 576 ? '0.8rem' : '0.9rem'
+                    }}>
+                      <span style={{
+                        display: 'inline-block',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: '#fff'
+                      }}></span>
+                      <span>30+ Articles</span>
+                    </div>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem',
+                      color: 'white',
+                      fontSize: windowWidth <= 576 ? '0.8rem' : '0.9rem'
+                    }}>
+                      <span style={{
+                        display: 'inline-block',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: '#fff'
+                      }}></span>
+                      <span>Weekly Updates</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
           {/* Third image */}

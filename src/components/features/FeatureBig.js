@@ -11,13 +11,10 @@ const FeatureBig = ({ image, title, description, buttonText }) => {
       <div style={{
         height: 'auto',
         minHeight: '250px',
-        maxHeight: '500px',
+        maxHeight: '400px',
         marginBottom: '1rem',
         overflow: 'hidden',
-        borderRadius: '4px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
+        borderRadius: '4px'
       }}>
         <img 
           src={image} 
@@ -25,8 +22,7 @@ const FeatureBig = ({ image, title, description, buttonText }) => {
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'contain',
-            objectPosition: 'center',
+            objectFit: 'cover',
             display: 'block'
           }} 
         />

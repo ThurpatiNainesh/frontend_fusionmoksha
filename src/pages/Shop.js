@@ -185,7 +185,13 @@ const Shop = () => {
       </ProductGrid>
       
       {pagination && pagination.totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem', gap: '0.5rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          marginTop: '2rem',
+          marginBottom: '3rem', /* Added margin bottom to create space before footer */
+          gap: '0.5rem'
+        }}>
           {/* Previous Page Button */}
           <button
             onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
@@ -200,7 +206,9 @@ const Shop = () => {
               background: 'white',
               color: currentPage === 1 ? '#ccc' : '#333',
               cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-              borderRadius: '0',
+              borderRadius: '4px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+              transition: 'all 0.2s ease',
             }}
           >
             &lt;
@@ -234,11 +242,17 @@ const Shop = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid #ddd',
-                  background: pageToShow === currentPage ? '#1890ff' : 'white',
+                  border: pageToShow === currentPage ? '1px solid #2e7d32' : '1px solid #ddd',
+                  background: pageToShow === currentPage ? '#2e7d32' : 'white',
                   color: pageToShow === currentPage ? 'white' : '#333',
                   cursor: 'pointer',
-                  borderRadius: '0',
+                  borderRadius: '4px',
+                  fontWeight: pageToShow === currentPage ? '600' : 'normal',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: pageToShow === currentPage ? '#2e7d32' : '#f5f5f5'
+                  },
                 }}
               >
                 {pageToShow}
@@ -260,7 +274,9 @@ const Shop = () => {
               background: 'white',
               color: currentPage === pagination.totalPages ? '#ccc' : '#333',
               cursor: currentPage === pagination.totalPages ? 'not-allowed' : 'pointer',
-              borderRadius: '0',
+              borderRadius: '4px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+              transition: 'all 0.2s ease',
             }}
           >
             &gt;

@@ -39,12 +39,19 @@ const ProductInfo = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  justify-content: space-between; /* Push content to top and bottom */
 `;
 
 const ProductName = styled.h3`
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
   color: #333;
+  height: 2.8rem; /* Fixed height for product name - approximately 2 lines */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 `;
 
 const ProductPrice = styled.p`
@@ -235,15 +242,15 @@ const ProductCard = ({ product, className }) => {
         )}
 
         {/* Price */}
-        <div style={{ margin: '0.3rem 0' }}>
+        <div style={{ margin: '0.3rem 0', height: '60px' }}>
           <div style={{ 
             display: 'flex', 
-            gap: '0.3rem', 
+            flexDirection: 'column',
             margin: '0.2rem 0',
-            alignItems: 'center',
-            flexWrap: 'wrap'
+            height: '100%',
+            justifyContent: 'center'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <span style={{ 
                   fontSize: '1.15rem', 
@@ -264,26 +271,26 @@ const ProductCard = ({ product, className }) => {
                   {selectedVariant.discountPrice || selectedVariant.price}
                 </span>
               </div>
-              {selectedVariant.originalPrice > (selectedVariant.discountPrice || selectedVariant.price) && (
-                <>
-                  <span style={{
-                    textDecoration: 'line-through',
-                    color: '#999',
-                    fontSize: '0.9rem',
-                    marginRight: '0.5rem'
-                  }}>
-                                      MRP  ₹ {selectedVariant.originalPrice}
-                  </span>
-                  <span style={{
-                    color: '#2e7d32',
-                    fontSize: '0.9rem',
-                    fontWeight: '500'
-                  }}>
-                    ({discountPercentage}% off)
-                  </span>
-                </>
-              )}
             </div>
+            {selectedVariant.originalPrice > (selectedVariant.discountPrice || selectedVariant.price) && (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{
+                  textDecoration: 'line-through',
+                  color: '#999',
+                  fontSize: '0.9rem',
+                  marginRight: '0.5rem'
+                }}>
+                  MRP ₹ {selectedVariant.originalPrice}
+                </span>
+                <span style={{
+                  color: '#2e7d32',
+                  fontSize: '0.9rem',
+                  fontWeight: '500'
+                }}>
+                  ({discountPercentage}% off)
+                </span>
+              </div>
+            )}
             {/* <span style={{ 
               position: 'relative',
               display: 'inline-flex',
@@ -300,7 +307,7 @@ const ProductCard = ({ product, className }) => {
         </div>
 
         {/* Add to Cart Button */}
-        <div style={{ marginTop: '0.3rem' }}>
+        <div style={{ marginTop: 'auto', padding: '0.5rem 0 0.2rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
           <AddToCartButton 
             product={productData} 
             weight={selectedVariant.weight}
@@ -320,6 +327,7 @@ const ProductCard = ({ product, className }) => {
               padding: '0.4rem 1.2rem',
               fontSize: '0.9rem',
               minWidth: '120px',
+              width: '100%',
               textAlign: 'center',
               textDecoration: 'none',
               whiteSpace: 'nowrap',

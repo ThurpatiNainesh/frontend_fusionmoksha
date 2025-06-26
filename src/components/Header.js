@@ -40,10 +40,13 @@ const IconContainer = styled.div`
   @media (max-width: 768px) {
     margin-left: auto;
     margin-right: 0.5rem;
+    padding-right: 10px;
   }
   
   @media (max-width: 576px) {
     gap: 0.8rem;
+    margin-right: 10px;
+    padding-right: 24px;
   }
 `;
 
@@ -60,6 +63,10 @@ const HeaderIcons = styled.div`
   display: flex;
   align-items: center;
   gap: 1.8rem;
+  
+  @media (max-width: 576px) {
+    gap: 1.2rem;
+  }
 `;
 
 const Icon = styled(FontAwesomeIcon)`
@@ -68,6 +75,10 @@ const Icon = styled(FontAwesomeIcon)`
   
   &:hover {
     color: #faad14;
+  }
+  
+  @media (max-width: 576px) {
+    font-size: 1rem;
   }
 `;
 
@@ -84,6 +95,11 @@ const MobileSearchIcon = styled(FontAwesomeIcon)`
   
   @media (max-width: 768px) {
     margin-right: 0.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    font-size: 1rem;
+    margin-right: 0.3rem;
   }
 `;
 
@@ -103,6 +119,21 @@ const CartDrawerOverlay = styled.div`
   opacity: ${props => props.isOpen ? 1 : 0};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
   transition: opacity 0.3s ease, visibility 0.3s ease;
+`;
+
+const MobileOverlay = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.isOpen ? 'block' : 'none'};
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 104;
+  }
 `;
 
 const CartDrawer = styled.div`
@@ -311,132 +342,22 @@ const RemoveButton = styled.button`
   }
 `;
 
-const CartItemWeight = styled.div`
-  font-size: 0.8rem;
-  color: #999;
-  margin-bottom: 0.5rem;
-`;
-
-const CartItemPriceWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-  width: 100%;
-`;
-
-const CartItemActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  display: ${props => props.isVisible ? 'block' : 'none'};
-  
-  input {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 200px;
-    font-size: 0.9rem;
-  }
-  
-  @media (max-width: 768px) {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    padding: 0.5rem;
-    background: white;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    z-index: 101;
-    
-    input {
-      width: 100%;
-    }
-  }
-`;
-
-const SearchForm = styled.form`
-  display: flex;
-  align-items: center;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const StyledSearchInput = styled.input`
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 200px;
-  font-size: 0.9rem;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const SearchButton = styled.button`
-  background: #faad14;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0 4px 4px 0;
-  cursor: pointer;
-  margin-left: -1px;
-  
-  &:hover {
-    background: #e69b00;
-  }
-`;
-
-const MobileCloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &:hover {
-    color: #faad14;
-  }
-`;
-
-const MobileOverlay = styled.div`
-  display: none;
-  
-  @media (max-width: 768px) {
-    display: ${props => props.isOpen ? 'block' : 'none'};
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 104;
-  }
-`;
-
+const CartItemWeight = styled.div``;
 
 const HeaderWrapper = styled.header`
-  background: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  background-color: white;
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 0.8rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0.6rem 0;
+  
+  @media (max-width: 992px) {
+    padding: 0.5rem 0;
+  }
   
   @media (max-width: 768px) {
-    padding: 0.5rem 0;
+    padding: 0.4rem 0;
   }
   
   @media (max-width: 576px) {
@@ -445,34 +366,42 @@ const HeaderWrapper = styled.header`
 `;
 
 const Container = styled.div`
-  width: 100%;
   max-width: 1200px;
-  margin: auto;
-  padding: 0.5rem;
+  margin: 0 auto;
+  padding: 0.2rem 1rem;
   
-  @media (max-width: 1200px) {
-    padding: 0.5rem 1rem;
+  @media (max-width: 992px) {
+    padding: 0.2rem 1rem;
   }
   
   @media (max-width: 768px) {
-    padding: 0.5rem 0.5rem;
+    padding: 0.15rem 0.8rem;
+  }
+  
+  @media (max-width: 576px) {
+    padding: 0.1rem 0.6rem;
   }
 `;
 
 const Flex = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: flex-start;
-  margin: 0.05rem 0;
-  width: 100%;
+  flex-wrap: wrap;
+  position: relative;
+  height: 65px;
+  
+  @media (max-width: 992px) {
+    height: 60px;
+  }
   
   @media (max-width: 768px) {
-    flex-wrap: nowrap;
-    justify-content: space-between;
+    height: 55px;
   }
   
   @media (max-width: 576px) {
-    padding: 0.3rem 0;
+    height: 50px;
+    justify-content: space-between;
   }
 `;
 
@@ -564,7 +493,7 @@ const MainNav = styled.nav`
 
 const LeftSection = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* Changed from flex-start to center */
   gap: 0.3rem;
   margin-right: 6rem;
   
@@ -578,12 +507,13 @@ const LeftSection = styled.div`
   
   @media (max-width: 768px) {
     margin-right: 0;
-    justify-content: flex-start;
-    width: auto;
+    justify-content: space-between; /* Changed to space-between to push logo left and menu right */
+    width: 100%;
   }
   
   @media (max-width: 576px) {
-    flex: 0;
+    flex: 1;
+    justify-content: space-between;
   }
 `;
 
@@ -621,6 +551,85 @@ const Logo = styled.div`
   }
 `;
 
+const MobileCloseButton = styled.button`
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: #faad14;
+  }
+`;
+
+const SearchContainer = styled.div`
+  position: relative;
+  display: ${props => props.isVisible ? 'block' : 'none'};
+  
+  input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    padding: 0.5rem;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 101;
+    
+    input {
+      width: 100%;
+    }
+  }
+`;
+
+const SearchForm = styled.form`
+  display: flex;
+  align-items: center;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const StyledSearchInput = styled.input`
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 200px;
+  font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const SearchButton = styled.button`
+  background: #faad14;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  margin-left: -1px;
+  
+  &:hover {
+    background: #e69b00;
+  }
+`;
+
 const MobileMenuToggle = styled.button`
   display: none;
   background: none;
@@ -629,7 +638,7 @@ const MobileMenuToggle = styled.button`
   cursor: pointer;
   color: #333;
   padding: 0.5rem;
-  margin-left: 0.5rem;
+  z-index: 102;
   
   &:hover {
     color: #faad14;
@@ -637,12 +646,16 @@ const MobileMenuToggle = styled.button`
   
   @media (max-width: 768px) {
     display: block;
-    order: -1;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
   @media (max-width: 576px) {
-    margin-left: 0;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    right: 10px;
+    padding: 0.3rem;
   }
 `;
 
@@ -674,13 +687,30 @@ const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: -110px;
   position: relative;
   z-index: 101;
   padding: 0.5rem 0;
+  height: 100%;
+  overflow: hidden;
+  
+  img {
+    max-height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  @media (max-width: 992px) {
+    padding: 0.3rem 0;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0.2rem 0;
+    max-width: 70%;
+  }
   
   @media (max-width: 576px) {
-    display: none; /* Hide logo on phone screens */
+    padding: 0.1rem 0;
+    display: flex; /* Ensure it's visible on mobile */
+    max-width: 60%;
   }
 `;
 
@@ -920,12 +950,24 @@ const Header = () => {
         <Flex>
           <LeftSection>
             <LogoContainer>
-              <img src="/images/mok1.2_03.png" alt="Fusion Moksha" style={{ height: '120px', width: 'auto' }} className="header-logo" />
+              <img 
+                src="/images/mok1.2_03.png" 
+                alt="Fusion Moksha" 
+                style={{ 
+                  height: '58px', 
+                  width: 'auto', 
+                  objectFit: 'contain',
+                  maxWidth: '100%' 
+                }} 
+                className="header-logo" 
+              />
             </LogoContainer>
-            <MobileMenuToggle onClick={toggleMobileMenu}>
-              <FontAwesomeIcon icon={faBars} />
-            </MobileMenuToggle>
           </LeftSection>
+          
+          {/* Mobile Menu Toggle Button (Hamburger) positioned on right side */}
+          <MobileMenuToggle onClick={toggleMobileMenu}>
+            <FontAwesomeIcon icon={faBars} />
+          </MobileMenuToggle>
           
           <MainNav className={mobileMenuOpen ? 'mobile-open' : ''}>
             <NavLink to="/" end onClick={handleNavLinkClick}>{t('home')}</NavLink>
@@ -1018,6 +1060,7 @@ const Header = () => {
             <LanguageSelect
               value={i18n.language}
               onChange={(e) => i18n.changeLanguage(e.target.value)}
+              style={{ marginRight: '30px' }}
             >
               <option value="en">English</option>
               <option value="hi">हिंदी</option>
